@@ -15,8 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include, re_path
+
+from team.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/drf-auth/', include('rest_framework.urls')),
+    path('api/team/', TeamsAPIList.as_view()),
+    path('api/team/<int:pk>/', TeamsAPIUpdate.as_view()),
+    path('api/teamdelete/<int:pk>/', TeamsAPIDestroy.as_view()),
+    path('api/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]
