@@ -10,7 +10,7 @@ class Teams(models.Model):
 
 class Teammates(models.Model):
     team = models.ForeignKey('Teams', on_delete=models.CASCADE, verbose_name='Команда')
-    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name='Пользователь')
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name='Пользователь')
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL, related_name='children', verbose_name='Вышестоящий')
     
     name = models.CharField(max_length=255)    
@@ -22,7 +22,7 @@ class Teammates(models.Model):
     ]
     rights = models.CharField(choices=RIGHTS, default='reader', max_length=255)
     
-    rank = models.CharField(blank=True, max_length=255, null=True)
+    rank = models.CharField(blank=True, default='-', max_length=255, null=True)
     parentname = models.CharField(blank=True, default='-', max_length=255, null=True)
     invite_time = models.DateTimeField(auto_now_add=True)
         
@@ -30,6 +30,9 @@ class Teammates(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
+        if not self.rank:
+            self.rank = '-'
+        
         if self.parent:
             self.parentname = self.parent.name
         else:

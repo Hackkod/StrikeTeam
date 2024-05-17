@@ -47,8 +47,6 @@ class CanCreateTeammateOrInventory(permissions.BasePermission):
         
         return True
 
-
-
 # class IsAdminOrReadOnly(permissions.BasePermission):
 #     def has_permissions(self, request, view):
 #         if request.method in permissions.SAFE_METHODS:
