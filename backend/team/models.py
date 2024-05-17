@@ -22,7 +22,7 @@ class Teammates(models.Model):
     ]
     rights = models.CharField(choices=RIGHTS, default='reader', max_length=255)
     
-    rank = models.CharField(max_length=255)
+    rank = models.CharField(blank=True, max_length=255, null=True)
     parentname = models.CharField(blank=True, default='-', max_length=255, null=True)
     invite_time = models.DateTimeField(auto_now_add=True)
         

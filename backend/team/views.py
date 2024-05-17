@@ -1,24 +1,26 @@
-from rest_framework import generics
-# from django.shortcuts import render
-# from django.forms import model_to_dict
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
 
 from .models import *
 from .serializers import *
-# from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsTeammate, CanCreateTeammateOrInventory
 
-class TeamsAPIList(generics.ListCreateAPIView):
+class TeamsViewSet(viewsets.ModelViewSet):
     queryset = Teams.objects.all()
     serializer_class = TeamsSerializer
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticated, IsTeammate]
 
-class TeamsAPIUpdate(generics.RetrieveUpdateAPIView):
-    queryset = Teams.objects.all()
-    serializer_class = TeamsSerializer  
-    # permission_classes = (IsAuthenticated,)
-    # authentication_classes = (TokenAuthentication,)
+class TeammatesViewSet(viewsets.ModelViewSet):
+    queryset = Teammates.objects.all()
+    serializer_class = TeammatesSerializer
+    permission_classes = [IsAuthenticated, IsTeammate, CanCreateTeammateOrInventory]
 
-class TeamsAPIDestroy(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Teams.objects.all()
-    serializer_class = TeamsSerializer 
-    # permission_classes = (IsAdminOrReadOnly,) 
+class InventoryViewSet(viewsets.ModelViewSet):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+    permission_classes = [IsAuthenticated, IsTeammate, CanCreateTeammateOrInventory]
+    
+# def logout_view(request):
+#     logout(request)
+#     return redirect('/')
     

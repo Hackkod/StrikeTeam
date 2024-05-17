@@ -16,15 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-
+from rest_framework.routers import DefaultRouter
 from team.views import *
+
+router = DefaultRouter()
+router.register(r'teams', TeamsViewSet)
+router.register(r'teammates', TeammatesViewSet)
+router.register(r'inventory', InventoryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('admin/logout/', logout_view, name='logout'),
     path('api/drf-auth/', include('rest_framework.urls')),
-    path('api/team/', TeamsAPIList.as_view()),
-    path('api/team/<int:pk>/', TeamsAPIUpdate.as_view()),
-    path('api/teamdelete/<int:pk>/', TeamsAPIDestroy.as_view()),
     path('api/auth/', include('djoser.urls')),
+    path('api/', include(router.urls)),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

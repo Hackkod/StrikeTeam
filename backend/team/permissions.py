@@ -1,15 +1,64 @@
 from rest_framework import permissions
+from .models import Teams, Teammates, Inventory
 
-class IsAdminOrReadOnly(permissions.BasePermission):
-    def has_permissions(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        
-        return bool(request.user and request.user.is_staff)
+class IsTeammate(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return Teammates.objects.filter(user=user).exists()
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
+        user = request.user
+        teammate = Teammates.objects.filter(user=user).first()
+        if not teammate:
+            return False
+
+        # Администраторы имеют полный доступ
+        if teammate.rights == 'admin':
             return True
 
-        return obj.user == request.user
+        # Чтение данных для тиммейтов
+        if request.method in permissions.SAFE_METHODS:
+            if isinstance(obj, Teams) or isinstance(obj, Teammates) or isinstance(obj, Inventory):
+                return obj.team.id == teammate.team.id
+
+        # Редактирование инвентаря для тиммейтов с правами editor
+        if teammate.rights == 'editor':
+            if isinstance(obj, Inventory):
+                return obj.team.id == teammate.team.id
+        
+        return False
+    
+class CanCreateTeammateOrInventory(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        teammate = Teammates.objects.filter(user=user).first()
+        
+        if not teammate:
+            return False
+        
+        # Только админы и редакторы могут создавать тиммейтов и инвентарь
+        if request.method == 'POST':
+            if teammate.rights == 'admin':
+                return True
+            if teammate.rights == 'editor':
+                if view.basename == 'inventory':
+                    return True
+            return False
+        
+        return True
+
+
+
+# class IsAdminOrReadOnly(permissions.BasePermission):
+#     def has_permissions(self, request, view):
+#         if request.method in permissions.SAFE_METHODS:
+#             return True
+        
+#         return bool(request.user and request.user.is_staff)
+
+# class IsOwnerOrReadOnly(permissions.BasePermission):
+#     def has_object_permission(self, request, view, obj):
+#         if request.method in permissions.SAFE_METHODS:
+#             return True
+
+#         return obj.user == request.user
