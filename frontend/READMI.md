@@ -3,6 +3,9 @@
 ## Project setup
 ```
 npm install
+
+### Установка @vue/cli
+npm install -g @vue/cli
 ```
 
 ### Compiles and hot-reloads for development
@@ -22,3 +25,5 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
