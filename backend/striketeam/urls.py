@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 from team.views import *
 
 router = DefaultRouter()
@@ -25,10 +30,12 @@ router.register(r'teammates', TeammatesViewSet)
 router.register(r'inventory', InventoryViewSet)
 
 urlpatterns = [
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('admin/', admin.site.urls),
     # path('admin/logout/', logout_view, name='logout'),
-    path('api/drf-auth/', include('rest_framework.urls')),
-    path('api/auth/', include('djoser.urls')),
+    # path('api/drf-auth/', include('rest_framework.urls')),
+    # path('api/auth/', include('djoser.urls')),
     path('api/', include(router.urls)),
-    re_path(r'^auth/', include('djoser.urls.authtoken')),
+    # re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]
