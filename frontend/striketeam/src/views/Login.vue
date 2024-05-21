@@ -15,6 +15,7 @@
           <button type="submit" class="btn">Войти</button>
           <router-link to="/register" class="register-link">Регистрация</router-link>
         </form>
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       </div>
     </div>
 </template>
@@ -26,16 +27,18 @@
     data() {
       return {
         username: '',
-        password: ''
+        password: '',
+        errorMessage: ''
       };
     },
     methods: {
       login() {
         AuthService.login(this.username, this.password)
           .then(() => {
-            this.$router.push('/teams');
+            this.$router.push('/structure');
           })
           .catch(error => {
+            this.errorMessage = 'Ошибка при входе: ' + (error.response?.data?.detail || 'Неизвестная ошибка');
             console.error('Ошибка при входе:', error);
           });
       }
@@ -50,74 +53,5 @@
 </script>
   
 <style scoped>
-
-.container {
-    text-align: center;
-    color: white;
-}
-
-.logo {
-    font-size: 36px;
-    margin-bottom: 20px;
-}
-
-.strike {
-    color: #e74c3c;
-}
-
-.team {
-    color: #ecf0f1;
-}
-
-.login-box {
-    background-color: #2c3e50;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.login-box h2 {
-    margin: 0 0 20px;
-}
-
-.textbox {
-    margin: 10px 0;
-}
-
-.textbox input {
-    width: 100%;
-    padding: 10px;
-    background: #34495e;
-    border: none;
-    outline: none;
-    color: white;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.btn {
-    width: 100%;
-    padding: 10px;
-    background: #3498db;
-    border: none;
-    outline: none;
-    color: white;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.register-link {
-    display: block;
-    margin-top: 20px;
-    color: #bdc3c7;
-    text-decoration: none;
-}
-
-.register-link:hover {
-    text-decoration: underline;
-}
-
 </style>
   

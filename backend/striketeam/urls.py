@@ -40,6 +40,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     # path('admin/logout/', logout_view, name='logout'),
-    # path('api/auth/', include('djoser.urls')),
-    # re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

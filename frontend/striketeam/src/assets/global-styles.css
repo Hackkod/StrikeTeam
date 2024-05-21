@@ -30,7 +30,7 @@ body.auth-page-body::before {
 }
 
 /* Стили для компонента */
-.container {
+/* .container {
     text-align: center;
     color: white;
 }
@@ -72,6 +72,7 @@ body.auth-page-body::before {
     color: white;
     border-radius: 5px;
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 .btn {
@@ -97,3 +98,95 @@ body.auth-page-body::before {
 .register-link:hover {
     text-decoration: underline;
 }
+
+.error-message {
+    color: red;
+    font-size: smaller;
+    margin-top: 10px;
+    margin-bottom: -20px;
+    max-width: 214px;
+    word-wrap: break-word;
+} */
+
+.container {
+    text-align: center;
+    color: white;
+  }
+  
+  .logo {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+  
+  .strike {
+    /* color: #e74c3c; */
+    color: #9B59B6;
+  }
+  
+  .team {
+    color: #ECF0F1;
+  }
+  
+  .login-box {
+    background-color: #2B2A3B;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .login-box h2 {
+    margin: 0 0 20px;
+  }
+  
+  .textbox {
+    margin: 10px 0;
+  }
+  
+  .textbox input {
+    width: 100%;
+    padding: 10px;
+    background: #3A3A5F;
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 10px;
+    background: #a55bc2;
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .btn:hover {
+    background: #b862db;
+  }
+  
+  .register-link {
+    display: block;
+    margin-top: 20px;
+    color: #BDC3C7;
+    text-decoration: none;
+  }
+  
+  .register-link:hover {
+    text-decoration: underline;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: smaller;
+    margin-top: 10px;
+    margin-bottom: -20px;
+    max-width: 214px;
+    word-wrap: break-word;
+  }

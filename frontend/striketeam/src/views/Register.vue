@@ -18,6 +18,7 @@
           <button type="submit" class="btn">Регистрация</button>
           <router-link to="/login" class="register-link">Уже есть аккаунт? Войти</router-link>
         </form>
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       </div>
     </div>
   </template>
@@ -30,7 +31,8 @@
       return {
         username: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        errorMessage: ''
       };
     },
     methods: {
@@ -44,6 +46,7 @@
             this.$router.push('/login');
           })
           .catch(error => {
+            this.errorMessage = 'Ошибка при регистрации: ' + (error.response?.data?.error || 'Неизвестная ошибка');
             console.error('Ошибка при регистрации:', error);
           });
       }
