@@ -30,12 +30,16 @@ router.register(r'teammates', TeammatesViewSet)
 router.register(r'inventory', InventoryViewSet)
 
 urlpatterns = [
+    # JWT аутентификация
+    path('api/register/', register, name='register'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # стандарт. аутентификация для теста на бэкэнде
+    path('api/drf-auth/', include('rest_framework.urls')),
+    # Main
     path('admin/', admin.site.urls),
-    # path('admin/logout/', logout_view, name='logout'),
-    # path('api/drf-auth/', include('rest_framework.urls')),
-    # path('api/auth/', include('djoser.urls')),
     path('api/', include(router.urls)),
+    # path('admin/logout/', logout_view, name='logout'),
+    # path('api/auth/', include('djoser.urls')),
     # re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

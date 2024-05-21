@@ -17,9 +17,9 @@
         </form>
       </div>
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   import AuthService from '../services/auth';
   
   export default {
@@ -39,56 +39,52 @@
             console.error('Ошибка при входе:', error);
           });
       }
+    },
+        mounted() {
+        document.body.classList.add('auth-page-body');
+    },
+        beforeUnmount() {
+        document.body.classList.remove('auth-page-body');
     }
   };
-  </script>
+</script>
   
-  <style scoped>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #121212;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .container {
+<style scoped>
+
+.container {
     text-align: center;
     color: white;
-  }
-  
-  .logo {
+}
+
+.logo {
     font-size: 36px;
     margin-bottom: 20px;
-  }
-  
-  .strike {
+}
+
+.strike {
     color: #e74c3c;
-  }
-  
-  .team {
+}
+
+.team {
     color: #ecf0f1;
-  }
-  
-  .login-box {
+}
+
+.login-box {
     background-color: #2c3e50;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  }
-  
-  .login-box h2 {
+}
+
+.login-box h2 {
     margin: 0 0 20px;
-  }
-  
-  .textbox {
+}
+
+.textbox {
     margin: 10px 0;
-  }
-  
-  .textbox input {
+}
+
+.textbox input {
     width: 100%;
     padding: 10px;
     background: #34495e;
@@ -97,9 +93,9 @@
     color: white;
     border-radius: 5px;
     font-size: 16px;
-  }
-  
-  .btn {
+}
+
+.btn {
     width: 100%;
     padding: 10px;
     background: #3498db;
@@ -110,17 +106,18 @@
     font-size: 16px;
     cursor: pointer;
     margin-top: 10px;
-  }
-  
-  .register-link {
+}
+
+.register-link {
     display: block;
     margin-top: 20px;
     color: #bdc3c7;
     text-decoration: none;
-  }
-  
-  .register-link:hover {
+}
+
+.register-link:hover {
     text-decoration: underline;
-  }
-  </style>
+}
+
+</style>
   

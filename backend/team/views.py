@@ -1,4 +1,9 @@
 from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 
 from .models import *
@@ -43,6 +48,21 @@ class InventoryViewSet(viewsets.ModelViewSet):
         user = self.request.user
         inventory = Inventory.objects.filter(team__teammates__user=user).distinct()
         return inventory
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    data = request.data
+    username = data.get('username')
+    password = data.get('password')
+    try:
+        user = User.objects.create(
+            username=username,
+            password=make_password(password)
+        )
+        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 # def logout_view(request):
 #     logout(request)

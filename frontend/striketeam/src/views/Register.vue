@@ -47,11 +47,16 @@
             console.error('Ошибка при регистрации:', error);
           });
       }
+    },
+        mounted() {
+        document.body.classList.add('auth-page-body');
+    },
+        beforeUnmount() {
+        document.body.classList.remove('auth-page-body');
     }
   };
   </script>
   
   <style scoped>
-  /* Стили аналогичны стилям страницы логина */
   </style>
   
