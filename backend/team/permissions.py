@@ -8,7 +8,16 @@ class IsTeammate(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         user = request.user
-        teammate = Teammates.objects.filter(user=user).first()
+        team_id = None
+
+        # Определяем команду в зависимости от типа объекта
+        if isinstance(obj, Teams):
+            team_id = obj.id
+        elif isinstance(obj, Teammates) or isinstance(obj, Inventory):
+            team_id = obj.team.id
+
+        # Проверяем, есть ли у пользователя права в этой команде
+        teammate = Teammates.objects.filter(user=user, team_id=team_id).first()
         if not teammate:
             return False
 
@@ -18,15 +27,15 @@ class IsTeammate(permissions.BasePermission):
 
         # Чтение данных для тиммейтов
         if request.method in permissions.SAFE_METHODS:
-            if isinstance(obj, Teams) or isinstance(obj, Teammates) or isinstance(obj, Inventory):
-                return obj.team.id == teammate.team.id
+            return True
 
         # Редактирование инвентаря для тиммейтов с правами editor
         if teammate.rights == 'editor':
             if isinstance(obj, Inventory):
-                return obj.team.id == teammate.team.id
-        
+                return True
+
         return False
+
     
 class CanCreateTeammateOrInventory(permissions.BasePermission):
     def has_permission(self, request, view):

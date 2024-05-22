@@ -1,16 +1,6 @@
 <template>
   <div class="structure-container">
-    <aside class="sidebar">
-      <div class="logo">
-        <span class="strike">Strike</span><span class="team">Team</span>
-      </div>
-      <nav>
-        <router-link to="/structure" class="navitem">Структура</router-link>
-        <router-link to="/inventory" class="navitem">Инвентарь</router-link>
-        <router-link to="/profile" class="navitem">Профиль</router-link>
-        <router-link to="#" class="navitem" @click.native="logout">Выход</router-link>
-      </nav>
-    </aside>
+    <NavBar />
     <main class="main-content">
       <div class="team-selector">
         <select v-model="selectedTeam" @change="fetchTeammates">
@@ -35,6 +25,7 @@
             <tr>
               <th>Позывной</th>
               <th>Ранг</th>
+              <th>Права</th>
               <th>Старший</th>
               <th>Вступил</th>
             </tr>
@@ -43,6 +34,7 @@
             <tr v-for="teammate in teammates" :key="teammate.id">
               <td>{{ teammate.name }}</td>
               <td>{{ teammate.rank }}</td>
+              <td>{{ teammate.rights }}</td>
               <td>{{ teammate.parentname }}</td>
               <td>{{ new Date(teammate.invite_time).toLocaleString() }}</td>
             </tr>
@@ -104,16 +96,12 @@ export default {
           }
         })
         .then(response => {
-          this.teammates = response.data;
+          this.teammates = response.data.filter(teammate => teammate.team === this.selectedTeam);
         })
         .catch(error => {
           console.error('Ошибка при получении списка тиммейтов:', error);
         });
       }
-    },
-    logout() {
-      AuthService.logout();
-      this.$router.push('/login');
     }
   }
 };
@@ -126,54 +114,6 @@ export default {
   background-color: #17141F;
 }
 
-.sidebar {
-  background-color: #2B2A3B;
-  padding: 20px;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.logo {
-  font-size: 24px;
-  margin-bottom: 20px;
-}
-
-.strike {
-  /* color: #e74c3c; */
-  color: #9B59B6;
-}
-
-.team {
-  color: #ECF0F1;
-}
-
-nav {
-  margin-top: 20px;
-  width: 100%;
-}
-
-.navitem {
-  display: block;
-  padding: 10px;
-  color: #ECF0F1;
-  text-decoration: none;
-  text-align: center;
-  border-radius: 5px;
-  margin: 10px 0;
-  cursor: pointer;
-}
-
-.navitem:hover {
-  background-color: #6C5B7B;
-}
-
-.logout-button {
-  background: none;
-  border: none;
-}
-
 .main-content {
   flex-grow: 1;
   padding: 20px;
@@ -184,14 +124,22 @@ nav {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .team-selector select {
-  padding: 10px;
+  padding: 10px 20px;
   background-color: #2B2A3B;
   color: white;
   border: none;
   border-radius: 5px;
+  font-size: 16px;
+}
+
+.team-selector select option {
+  margin: 10px 20px; /* Увеличенный padding */
+  background-color: #2B2A3B;
+  color: white;
 }
 
 .table-toolbar {
@@ -211,6 +159,11 @@ nav {
 
 .table-toolbar button.active {
   color: #9B59B6;
+}
+
+.table-view {
+  padding: 10px;
+  background-color: #2B2A3B;
 }
 
 .table-view table {

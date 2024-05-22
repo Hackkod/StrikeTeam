@@ -1,12 +1,16 @@
 <template>
-    <div>
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="strike">Strike</span><span class="team">Team</span>
+      </div>
+      <div class="navbar-line"></div>
       <nav>
-        <router-link to="/">Home</router-link>
-        <router-link to="/teams">Teams</router-link>
-        <router-link to="/inventory">Inventory</router-link>
-        <button @click="logout">Logout</button>
+        <router-link to="/structure" class="navitem">Структура</router-link>
+        <router-link to="/inventory" class="navitem">Инвентарь</router-link>
+        <router-link to="/profile" class="navitem">Профиль</router-link>
+        <router-link to="#" class="navitem" @click.native="logout">Выход</router-link>
       </nav>
-    </div>
+    </aside>
   </template>
   
   <script>
@@ -23,23 +27,49 @@
   </script>
   
   <style scoped>
-  nav {
-    background-color: #2c3e50;
-    padding: 1em;
+  .sidebar {
+    background-color: #2B2A3B;
+    padding: 20px;
+    padding-top: 25px;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
-  nav a {
-    color: #ecf0f1;
-    margin: 0 1em;
+  .logo {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .strike {
+    color: #9B59B6;
+  }
+  
+  .team {
+    color: #ECF0F1;
+  }
+  
+  .navbar-line {
+    background-color: #35334a;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  .navitem {
+    display: block;
+    padding: 10px;
+    color: #ECF0F1;
     text-decoration: none;
+    text-align: center;
+    border-radius: 5px;
+    margin: 10px 0;
+    cursor: pointer;
   }
   
-  button {
-    background: none;
-    border: none;
-    color: #ecf0f1;
-    cursor: pointer;
-    margin-left: 1em;
+  .navitem:hover {
+    background-color: #6C5B7B;
   }
   </style>
   

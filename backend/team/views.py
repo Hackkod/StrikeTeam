@@ -13,8 +13,14 @@ from .permissions import IsTeammate, CanCreateTeammateOrInventory
 class TeamsViewSet(viewsets.ModelViewSet):
     queryset = Teams.objects.all()
     serializer_class = TeamsSerializer
-    permission_classes = [IsAuthenticated, IsTeammate]
     
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsTeammate]
+        return [permission() for permission in permission_classes]
+
     def get_queryset(self):
         user = self.request.user
         teams = Teams.objects.filter(teammates__user=user).distinct()
@@ -22,7 +28,8 @@ class TeamsViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         team = serializer.save()
-        Teammates.objects.create(
+        # Отключение проверок разрешений для создания тиммейта
+        self.request.user.teammates_set.create(
             team=team,
             user=self.request.user,
             name=self.request.user.username,
@@ -48,6 +55,12 @@ class InventoryViewSet(viewsets.ModelViewSet):
         user = self.request.user
         inventory = Inventory.objects.filter(team__teammates__user=user).distinct()
         return inventory
+    
+    def perform_create(self, serializer):
+        team = self.request.data.get('team')
+        if team:
+            team = Teams.objects.get(id=team)
+        serializer.save(team=team)
     
 @api_view(['POST'])
 @permission_classes([AllowAny])

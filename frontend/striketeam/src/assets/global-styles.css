@@ -120,6 +120,7 @@ body.auth-page-body::before {
   
   .strike {
     /* color: #e74c3c; */
+    /* color: #7952ce; */
     color: #9B59B6;
   }
   
@@ -157,6 +158,7 @@ body.auth-page-body::before {
   .btn {
     width: 100%;
     padding: 10px;
+    /* background: #765bc2; */
     background: #a55bc2;
     border: none;
     outline: none;
@@ -168,6 +170,7 @@ body.auth-page-body::before {
   }
   
   .btn:hover {
+    /* background: #8261dd; */
     background: #b862db;
   }
   
