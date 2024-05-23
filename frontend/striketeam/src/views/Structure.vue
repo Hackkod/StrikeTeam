@@ -276,16 +276,10 @@ export default {
       if (!user || !this.selectedTeam) {
         return 'reader';
       }
-      // console.log("user =====:", user.name);
-      // console.log("teammate =====:", this.teammates.find(tm => tm.user));
-      // const t = this.teammates.find(tm => tm.user);
-      // console.log("t =====:", t.team);
       const teammate = this.teammates.find(tm => tm.user && tm.user.id === user.id );
       if (teammate) {
-        // console.log("User rights in selected team:", teammate.rights);
         return teammate.rights;
       } else {
-        // console.log("Teammate not found for current user in selected team");
         return 'reader';
       }
     },
