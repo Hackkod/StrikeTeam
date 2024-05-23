@@ -1,11 +1,16 @@
 <template>
-    <div class="modal">
+    <div class="modal-overlay">
       <div class="modal-content">
         <h2>Добавить команду</h2>
         <form @submit.prevent="saveTeam">
-          <input v-model="team.teamname" placeholder="Название команды" required />
+          <div class="form-group">
+            <label for="teamname">Название команды</label>
+            <input type="text" v-model="teamname" id="teamname" required />
+          </div>
           <button type="submit">Сохранить</button>
           <button type="button" @click="$emit('close')">Отмена</button>
+          <!-- <input v-model="team.teamname" placeholder="Название команды" required />
+          <button type="submit">Сохранить</button> -->
         </form>
       </div>
     </div>
@@ -29,52 +34,39 @@
   </script>
   
   <style scoped>
-  .modal {
+  .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.7);
   }
   
   .modal-content {
-    background: #2B2A3B;
+    background: white;
     padding: 20px;
     border-radius: 5px;
-    text-align: center;
+    width: 300px;
   }
   
-  form input {
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
     display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: calc(100% - 22px);
-    background-color: #3C3B4F;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    margin-bottom: 5px;
   }
   
-  button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #9B59B6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #8E44AD;
-  }
-  
-  button[type="button"] {
-    margin-left: 10px;
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
   }
   </style>
   

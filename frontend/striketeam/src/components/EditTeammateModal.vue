@@ -5,15 +5,15 @@
         <form @submit.prevent="save">
           <div class="form-group">
             <label for="name">Имя</label>
-            <input type="text" v-model="editedTeammate.name" id="name" required />
+            <input type="text" v-model="teammate.name" id="name" required />
           </div>
           <div class="form-group">
             <label for="rank">Ранг</label>
-            <input type="text" v-model="editedTeammate.rank" id="rank" />
+            <input type="text" v-model="teammate.rank" id="rank" />
           </div>
           <div class="form-group">
             <label for="rights">Права</label>
-            <select v-model="editedTeammate.rights" id="rights">
+            <select v-model="teammate.rights" id="rights">
               <option value="admin">Администратор</option>
               <option value="editor">Редактор</option>
               <option value="reader">Читатель</option>
@@ -21,7 +21,7 @@
           </div>
           <div class="form-group">
             <label for="user">Пользователь</label>
-            <select v-model="editedTeammate.user" id="user">
+            <select v-model="teammate.user" id="user">
               <option :value="null">Не выбран</option>
               <option v-for="user in users" :key="user.id" :value="user.id">
                 {{ user.username }}
@@ -30,9 +30,9 @@
           </div>
           <div class="form-group">
             <label for="parent">Старший</label>
-            <select v-model="editedTeammate.parent" id="parent">
+            <select v-model="teammate.parent" id="parent">
               <option :value="null">Не выбран</option>
-              <option v-for="parent in parents" :key="parent.id" :value="parent.id">
+              <option v-for="parent in teammates" :key="parent.id" :value="parent.id">
                 {{ parent.name }}
               </option>
             </select>
@@ -45,43 +45,63 @@
   </template>
   
   <script>
-  export default {
-    props: {
-      teammate: {
-        type: Object,
-        required: true,
-      },
-    },
+    import axios from 'axios';
+    import AuthService from '@/services/auth';
+
+    export default {
+    name: 'EditTeammateModal',
+    props: ['teamId', 'teammate'],
     data() {
-      return {
-        editedTeammate: { ...this.teammate },
+        return {
         users: [],
-        parents: [],
-      };
+        teammates: []
+        };
     },
     methods: {
-      save() {
-        this.$emit('save', this.editedTeammate);
-      },
-      close() {
+        fetchUsers() {
+        const user = AuthService.getCurrentUser();
+        if (user) {
+            axios.get('http://127.0.0.1:8000/api/users/', {
+            headers: {
+                Authorization: `Bearer ${user.access}`
+            }
+            })
+            .then(response => {
+            this.users = response.data;
+            })
+            .catch(error => {
+            console.error('Error fetching users:', error);
+            });
+        }
+        },
+        fetchTeammates() {
+        const user = AuthService.getCurrentUser();
+        if (user && this.teamId) {
+            axios.get(`http://127.0.0.1:8000/api/teammates/?team=${this.teamId}`, {
+            headers: {
+                Authorization: `Bearer ${user.access}`
+            }
+            })
+            .then(response => {
+            this.teammates = response.data.filter(teammate => teammate.team === this.teamId);
+            })
+            .catch(error => {
+            console.error('Error fetching teammates:', error);
+            });
+        }
+        },
+        save() {
+        this.$emit('save', this.teammate);
+        },
+        close() {
         this.$emit('close');
-      },
-      fetchUsers() {
-        this.axios.get('/api/users/').then(response => {
-          this.users = response.data;
-        });
-      },
-      fetchParents() {
-        this.axios.get(`/teams/${this.editedTeammate.team}/teammates`).then(response => {
-          this.parents = response.data;
-        });
-      },
+        }
     },
     mounted() {
-      this.fetchUsers();
-      this.fetchParents();
-    },
-  };
+        this.fetchUsers();
+        this.fetchTeammates();
+    }
+    };
   </script>
   
   <style scoped>
