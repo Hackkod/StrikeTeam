@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -61,6 +61,12 @@ class InventoryViewSet(viewsets.ModelViewSet):
         if team:
             team = Teams.objects.get(id=team)
         serializer.save(team=team)
+        
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
     
 @api_view(['POST'])
 @permission_classes([AllowAny])

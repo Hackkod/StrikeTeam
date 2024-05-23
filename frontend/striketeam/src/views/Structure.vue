@@ -1,5 +1,9 @@
 <template>
-  <div class="structure-container">
+  <head>
+    <!-- Другие ваши теги -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  </head>
+  <div class="structure-container" @click.self="clearSelection">
     <NavBar />
     <main class="main-content">
       <div class="team-selector">
@@ -8,6 +12,9 @@
             {{ team.teamname }}
           </option>
         </select>
+        <button @click="openAddTeamModal"><i class="fa fa-plus"></i></button>
+        <button @click="openEditTeamModal"><i class="fa fa-pen"></i></button>
+        <button @click="openDeleteTeamModal"><i class="fa fa-trash"></i></button>
       </div>
       <div class="table-toolbar">
         <button @click="viewMode = 'hierarchy'" :class="{ active: viewMode === 'hierarchy' }">
@@ -19,32 +26,51 @@
           &#x1F4C4;
         </button>
       </div>
-      <div v-if="viewMode === 'table'" class="table-view">
-        <table>
-          <thead>
-            <tr>
-              <th>Позывной</th>
-              <th>Ранг</th>
-              <th>Права</th>
-              <th>Старший</th>
-              <th>Вступил</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="teammate in teammates" :key="teammate.id">
-              <td>{{ teammate.name }}</td>
-              <td>{{ teammate.rank }}</td>
-              <td>{{ teammate.rights }}</td>
-              <td>{{ teammate.parentname }}</td>
-              <td>{{ new Date(teammate.invite_time).toLocaleString() }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div v-else class="hierarchy-view">
-        <!-- Иерархическое представление будет реализовано позже -->
+      <div class="table-container">
+        <div v-if="viewMode === 'table'" class="table-view">
+          <table>
+            <thead>
+              <tr>
+                <th>Позывной</th>
+                <th>Ранг</th>
+                <th>Права</th>
+                <th>Старший</th>
+                <th>Вступил</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="teammate in teammates" :key="teammate.id" @click.stop="selectTeammate(teammate)" :class="{ selected: selectedTeammate === teammate }">
+                <td>{{ teammate.name }}</td>
+                <td>{{ teammate.rank }}</td>
+                <td>{{ teammate.rights }}</td>
+                <td>{{ teammate.parentname}}</td>
+                <td>{{ new Date(teammate.invite_time).toLocaleString() }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="hierarchy-view">
+          <!-- Иерархическое представление будет реализовано позже -->
+        </div>
+        <div class="action-icons">
+          <button @click="openAddModal" v-if="canAdd"><i class="fa fa-plus"></i></button>
+          <button @click="openEditModal" v-if="canEdit" :disabled="!selectedTeammate"><i class="fa fa-pen"></i></button>
+          <button @click="openDeleteModal" v-if="canDelete" :disabled="!selectedTeammate"><i class="fa fa-trash"></i></button>
+        </div>
       </div>
     </main>
+
+    <AddTeamModal v-if="showAddTeamModal" @close="closeAddTeamModal" @save="addTeam" />
+    <EditTeamModal v-if="showEditTeamModal" :team="getTeamById(selectedTeam)" @close="closeEditTeamModal" @save="editTeam" />
+    <DeleteTeamModal v-if="showDeleteTeamModal" :team="getTeamById(selectedTeam)" @close="closeDeleteTeamModal" @confirm="deleteTeam" />
+
+    <AddTeammateModal v-if="showAddModal" :teamId="selectedTeam" @close="closeAddModal" @save="addTeammate" />
+    <EditTeammateModal v-if="showEditModal" :teamId="selectedTeam" :teammate="selectedTeammate" @close="closeEditModal" @save="editTeammate" />
+    <DeleteTeammateModal v-if="showDeleteModal" :teamId="selectedTeam" :teammate="selectedTeammate" @close="closeDeleteModal" @confirm="deleteTeammate" />
+
+    <!-- <AddTeammateModal v-if="isAddModalOpen" :teamId="selectedTeam" @save="addTeammate" @close="closeAddModal" />
+    <EditTeammateModal v-if="isEditModalOpen" :teammate="selectedTeammate" @save="updateTeammate" @close="closeEditModal" />
+    <DeleteTeammateModal v-if="isDeleteModalOpen" :teammate="selectedTeammate" @confirm="deleteTeammate" @close="closeDeleteModal" /> -->
   </div>
 </template>
 
@@ -52,21 +78,158 @@
 import axios from 'axios';
 import AuthService from '../services/auth';
 import NavBar from '../components/NavBar.vue';
+import AddTeamModal from '../components/AddTeamModal.vue';
+import EditTeamModal from '../components/EditTeamModal.vue';
+import DeleteTeamModal from '../components/DeleteTeamModal.vue';
+import AddTeammateModal from '../components/AddTeammateModal.vue';
+import EditTeammateModal from '../components/EditTeammateModal.vue';
+import DeleteTeammateModal from '../components/DeleteTeammateModal.vue';
 
 export default {
-  components: { NavBar },
+  components: { NavBar, AddTeamModal, EditTeamModal, DeleteTeamModal, AddTeammateModal, EditTeammateModal, DeleteTeammateModal },
   data() {
     return {
       teams: [],
-      selectedTeam: null,
       teammates: [],
-      viewMode: 'table' // table or hierarchy
+      selectedTeam: null,
+      selectedTeammate: null,
+      viewMode: 'table', // table or hierarchy
+      showAddModal: false,
+      showEditModal: false,
+      showDeleteModal: false,
+      showAddTeamModal: false,
+      showEditTeamModal: false,
+      showDeleteTeamModal: false,
     };
+  },
+  computed: {
+    canAdd() {
+      return this.getRightsForSelectedTeam() === 'admin';
+    },
+    canEdit() {
+      const rights = this.getRightsForSelectedTeam();
+      return rights === 'admin' || rights === 'editor';
+    },
+    canDelete() {
+      return this.getRightsForSelectedTeam() === 'admin';
+    },
   },
   mounted() {
     this.fetchTeams();
+    document.addEventListener('click', this.handleDocumentClick);
+
+    if (this.teams.length > 0) {
+      this.selectedTeam = this.teams[0].id;
+    }
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleDocumentClick);
   },
   methods: {
+    addTeam(newTeam) {
+      const user = AuthService.getCurrentUser();
+      if (user) {
+        axios.post('http://127.0.0.1:8000/api/teams/', newTeam, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeams();
+          this.closeAddTeamModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при добавлении команды:', error);
+        });
+      }
+    },
+    editTeam(updatedTeam) {
+      const user = AuthService.getCurrentUser();
+      if (user) {
+        axios.put(`http://127.0.0.1:8000/api/teams/${updatedTeam.id}/`, updatedTeam, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeams();
+          this.closeEditTeamModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при обновлении команды:', error);
+        });
+      }
+    },
+    deleteTeam() {
+      const user = AuthService.getCurrentUser();
+      if (user) {
+        axios.delete(`http://127.0.0.1:8000/api/teams/${this.selectedTeam}/`, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeams();
+          this.closeDeleteTeamModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при удалении команды:', error);
+        });
+      }
+    },
+
+    addTeammate(newTeammate) {
+      const user = AuthService.getCurrentUser();
+      if (user) {
+        axios.post('http://127.0.0.1:8000/api/teammates/', newTeammate, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeammates();
+          this.closeAddModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при добавлении тиммейта:', error);
+        });
+      }
+    },
+    editTeammate(updatedTeammate) {
+      const user = AuthService.getCurrentUser();
+      if (user) {
+        axios.put(`http://127.0.0.1:8000/api/teammates/${updatedTeammate.id}/`, updatedTeammate, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeammates();
+          this.closeEditModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при обновлении тиммейта:', error);
+        });
+      }
+    },
+    deleteTeammate() {
+      const user = AuthService.getCurrentUser();
+      if (user && this.selectedTeammate) {
+        axios.delete(`http://127.0.0.1:8000/api/teammates/${this.selectedTeammate.id}/`, {
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        })
+        .then(() => {
+          this.fetchTeammates();
+          this.closeDeleteModal();
+        })
+        .catch(error => {
+          console.error('Ошибка при удалении тиммейта:', error);
+        });
+      }
+    },
+
     fetchTeams() {
       const user = AuthService.getCurrentUser();
       if (user) {
@@ -96,12 +259,89 @@ export default {
           }
         })
         .then(response => {
+          // console.log('Response from API:', response.data);
           this.teammates = response.data.filter(teammate => teammate.team === this.selectedTeam);
+          this.selectedTeammate = null;
         })
         .catch(error => {
           console.error('Ошибка при получении списка тиммейтов:', error);
         });
       }
+    },
+    getTeamById(id) {
+      return this.teams.find(team => team.id === id);
+    },
+    getRightsForSelectedTeam() {
+      const user = AuthService.getCurrentUser();
+      if (!user || !this.selectedTeam) {
+        return 'reader';
+      }
+      // console.log("user =====:", user.name);
+      // console.log("teammate =====:", this.teammates.find(tm => tm.user));
+      // const t = this.teammates.find(tm => tm.user);
+      // console.log("t =====:", t.team);
+      const teammate = this.teammates.find(tm => tm.user && tm.user.id === user.id );
+      if (teammate) {
+        // console.log("User rights in selected team:", teammate.rights);
+        return teammate.rights;
+      } else {
+        // console.log("Teammate not found for current user in selected team");
+        return 'reader';
+      }
+    },
+    selectTeammate(teammate) {
+      this.selectedTeammate = this.selectedTeammate === teammate ? null : teammate;
+    },
+    clearSelection() {
+      if (!this.showEditModal && !this.showDeleteModal) {
+        this.selectedTeammate = null;
+      }
+    },
+    handleDocumentClick(event) {
+      // Если клик произошел вне таблицы
+      if (!this.$el.contains(event.target)) {
+        this.clearSelection();
+      }
+    },
+
+    // Методы для форм команд
+    openAddTeamModal() {
+      this.showAddTeamModal = true;
+    },
+    closeAddTeamModal() {
+      this.showAddTeamModal = false;
+    },
+    openEditTeamModal() {
+      this.showEditTeamModal = true;
+    },
+    closeEditTeamModal() {
+      this.showEditTeamModal = false;
+    },
+    openDeleteTeamModal() {
+      this.showDeleteTeamModal = true;
+    },
+    closeDeleteTeamModal() {
+      this.showDeleteTeamModal = false;
+    },
+
+    // Методы для форм тиммейтов
+    openAddModal() {
+      this.showAddModal = true;
+    },
+    closeAddModal() {
+      this.showAddModal = false;
+    },
+    openEditModal() {
+      this.showEditModal = true;
+    },
+    closeEditModal() {
+      this.showEditModal = false;
+    },
+    openDeleteModal() {
+      this.showDeleteModal = true;
+    },
+    closeDeleteModal() {
+      this.showDeleteModal = false;
     }
   }
 };
@@ -124,7 +364,6 @@ export default {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
-  position: relative;
 }
 
 .team-selector select {
@@ -137,7 +376,7 @@ export default {
 }
 
 .team-selector select option {
-  margin: 10px 20px; /* Увеличенный padding */
+  margin: 10px 20px;
   background-color: #2B2A3B;
   color: white;
 }
@@ -161,9 +400,16 @@ export default {
   color: #9B59B6;
 }
 
-.table-view {
-  padding: 10px;
+.table-container {
+  display: flex;
   background-color: #2B2A3B;
+  padding: 10px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.table-view {
+  flex-grow: 1;
 }
 
 .table-view table {
@@ -179,7 +425,42 @@ export default {
   text-align: left;
 }
 
+.table-view tr.selected {
+  background-color: #9B59B6;
+  color: white;
+}
+
 .hierarchy-view {
   color: white;
+}
+
+.action-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #17141F;
+  padding: 0 5px 10px 5px;
+  border-radius: 5px;
+  margin-left: 10px;
+  height: 100px;
+}
+
+.action-icons button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.action-icons button:hover {
+  color: #9B59B6;
+}
+
+.action-icons button:disabled {
+  color: rgb(85, 85, 85);
+  cursor:default;
 }
 </style>

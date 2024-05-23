@@ -39,5 +39,6 @@ urlpatterns = [
     # Main
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/users/', UserListView.as_view(), name='user-list'),
     # path('admin/logout/', logout_view, name='logout'),
 ]

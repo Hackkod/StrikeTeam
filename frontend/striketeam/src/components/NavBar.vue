@@ -44,6 +44,7 @@
   
   .strike {
     color: #9B59B6;
+    /* color: #b965da; */
   }
   
   .team {
