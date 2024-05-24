@@ -16,18 +16,17 @@
         <button @click="openEditTeamModal"><i class="fa fa-pen"></i></button>
         <button @click="openDeleteTeamModal"><i class="fa fa-trash"></i></button>
       </div>
-      <div class="table-toolbar">
+      <!-- <div class="table-toolbar">
         <button @click="viewMode = 'hierarchy'" :class="{ active: viewMode === 'hierarchy' }">
-          <!-- иконка для иерархического вида -->
           &#x1F5C3;
         </button>
         <button @click="viewMode = 'table'" :class="{ active: viewMode === 'table' }">
-          <!-- иконка для табличного вида -->
           &#x1F4C4;
         </button>
-      </div>
+      </div> -->
       <div class="table-container">
-        <div v-if="viewMode === 'table'" class="table-view">
+        <!-- <div v-if="viewMode === 'table'" class="table-view"> -->
+        <div class="table-view">
           <table>
             <thead>
               <tr>
@@ -49,9 +48,9 @@
             </tbody>
           </table>
         </div>
-        <div v-else class="hierarchy-view">
+        <!-- <div v-else class="hierarchy-view"> -->
           <!-- Иерархическое представление будет реализовано позже -->
-        </div>
+        <!-- </div> -->
         <div class="action-icons">
           <button @click="openAddModal" v-if="canAdd"><i class="fa fa-plus"></i></button>
           <button @click="openEditModal" v-if="canEdit" :disabled="!selectedTeammate"><i class="fa fa-pen"></i></button>

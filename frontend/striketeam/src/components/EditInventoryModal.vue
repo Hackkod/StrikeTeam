@@ -1,121 +1,132 @@
 <template>
-    <div class="modal-container" @click.self="close">
+    <div class="modal-overlay" @click.self="close">
       <div class="modal-content">
-        <h2>Редактировать Инвентарь</h2>
-        <form @submit.prevent="handleSubmit">
-          <label for="name">Название:</label>
-          <input type="text" v-model="name" required />
-  
-          <label for="description">Описание:</label>
-          <textarea v-model="description" required></textarea>
-  
-          <label for="quantity">Количество:</label>
-          <input type="number" v-model="quantity" required />
-  
-          <div class="buttons">
-            <button type="submit">Сохранить</button>
-            <button type="button" @click="close">Отмена</button>
+        <h2>Изменить предмет инвентаря</h2>
+        <form @submit.prevent="save">
+          <div class="form-group">
+            <label for="inventname">Наименование</label>
+            <input type="text" v-model="item.inventname" id="inventname" required />
           </div>
+          <div class="form-group">
+            <label for="amount">Количество</label>
+            <input type="number" v-model="item.amount" id="amount" required />
+          </div>
+          <div class="form-group">
+            <label for="teammate">Владелец</label>
+            <select v-model="item.teammate" id="teammate">
+              <option :value="null">Команда</option>
+              <option v-for="teammate in teammates" :key="teammate.id" :value="teammate.id">
+                {{ teammate.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="category">Категория</label>
+            <select v-model="item.category" id="category" v-if="categories.length">
+              <option v-for="category in categories" :key="category[0]" :value="category[0]">
+                {{ category[1] }}
+              </option>
+            </select>
+            <span v-else>Загрузка категорий...</span>
+          </div>
+          <button type="submit">Сохранить</button>
+          <button type="button" @click="close">Отмена</button>
         </form>
       </div>
     </div>
   </template>
   
   <script>
+  import axios from 'axios';
+  import AuthService from '@/services/auth';
+  
   export default {
-    props: {
-      teamId: {
-        type: Number,
-        required: true
-      },
-      item: {
-        type: Object,
-        required: true
-      }
-    },
+    name: 'EditInventoryModal',
+    props: ['teamId', 'item'],
     data() {
       return {
-        name: this.item.name,
-        description: this.item.description,
-        quantity: this.item.quantity
+        teammates: [],
+        categories: []
       };
     },
     methods: {
-      handleSubmit() {
-        const updatedItem = {
-          id: this.item.id,
-          name: this.name,
-          description: this.description,
-          quantity: this.quantity,
-          team: this.teamId,
-        };
-        this.$emit('save', updatedItem);
+      fetchTeammates() {
+        const user = AuthService.getCurrentUser();
+        if (user && this.teamId) {
+          axios.get(`http://127.0.0.1:8000/api/teammates/?team=${this.teamId}`, {
+            headers: {
+              Authorization: `Bearer ${user.access}`
+            }
+          })
+          .then(response => {
+            this.teammates = response.data;
+          })
+          .catch(error => {
+            console.error('Ошибка при получении списка тиммейтов:', error);
+          });
+        }
+      },
+      fetchCategories() {
+        axios.get('http://127.0.0.1:8000/api/inventory/categories/', {
+          headers: {
+            Authorization: `Bearer ${AuthService.getCurrentUser().access}`
+          }
+        })
+        .then(response => {
+          this.categories = response.data;
+        })
+        .catch(error => {
+          console.error('Ошибка при получении категорий:', error);
+        });
+      },
+      save() {
+        this.$emit('save', this.item);
       },
       close() {
         this.$emit('close');
       }
+    },
+    mounted() {
+      this.fetchCategories();
+      this.fetchTeammates();
     }
   };
   </script>
   
   <style scoped>
-  .modal-container {
+  .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
   }
   
   .modal-content {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 4px;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
     width: 300px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
   
-  h2 {
-    margin-top: 0;
+  .form-group {
+    margin-bottom: 15px;
   }
   
-  label {
+  .form-group label {
     display: block;
-    margin: 0.5rem 0 0.25rem;
+    margin-bottom: 5px;
   }
   
-  input, textarea {
+  .form-group input,
+  .form-group select {
     width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .buttons {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  button[type="button"] {
-    background-color: #f44336;
-    color: white;
+    padding: 8px;
+    box-sizing: border-box;
   }
   </style>
   

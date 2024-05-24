@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status, generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -62,6 +62,11 @@ class InventoryViewSet(viewsets.ModelViewSet):
             team = Teams.objects.get(id=team)
         serializer.save(team=team)
         
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def categories(self, request):
+        categories = Inventory.CATEGORIES
+        return Response(categories)
+        
 
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
@@ -82,6 +87,50 @@ def register(request):
         return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        print(f"Deleting user: {user.username}")  # Debugging print
+        user.delete()
+        return Response(status=204)
+
+    
+    
+# class UserDetailView(generics.RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_object(self):
+#         return self.request.user
+
+#     def update(self, request, *args, **kwargs):
+#         user = self.get_object()
+#         data = request.data
+
+#         user.username = data.get('username', user.username)
+#         password = data.get('password')
+#         if password and password != '********':
+#             user.password = make_password(password)
+
+#         user.save()
+
+#         serializer = self.get_serializer(user)
+#         return Response(serializer.data)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def DeleteUserView(request):
+    user = request.user
+    user.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
     
 # def logout_view(request):
 #     logout(request)

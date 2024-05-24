@@ -46,7 +46,7 @@ class Inventory(models.Model):
     
     inventname = models.CharField(max_length=255, verbose_name='Наименование')
     amount = models.IntegerField(default=1, verbose_name='Количество')
-    teammate_name = models.CharField(max_length=255, verbose_name='Имя владельца')
+    teammate_name = models.CharField(blank=True, default='Команда', max_length=255, verbose_name='Имя владельца', null=True)
     
     CATEGORIES = [
         ('pyrotechnics', 'Пиротехника'),

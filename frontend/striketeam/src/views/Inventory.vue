@@ -7,7 +7,7 @@
       <NavBar />
       <main class="main-content">
         <div class="team-selector">
-          <select v-model="selectedTeam" @change="fetchInventory">
+          <select v-model="selectedTeam" @change="fetchInventoryAndTeammates">
             <option v-for="team in teams" :key="team.id" :value="team.id">
               {{ team.teamname }}
             </option>
@@ -21,23 +21,18 @@
             <table>
                 <thead>
                     <tr>
-                    <th>Наименование</th>
-                    <th>Количество</th>
-                    <th>Владелец</th>
-                    <th>Категория</th>
-                    <th>Действия</th>
+                        <th>Наименование</th>
+                        <th>Количество</th>
+                        <th>Владелец</th>
+                        <th>Категория</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in inventory" :key="item.id" @click="selectItem(item)" :class="{ selected: item.id === selectedItem?.id }">
+                    <tr v-for="item in inventory" :key="item.id" @click.stop="selectItem(item)" :class="{ selected: item === selectedItem }">
                         <td>{{ item.inventname }}</td>
                         <td>{{ item.amount }}</td>
                         <td>{{ item.teammate_name }}</td>
                         <td>{{ item.category }}</td>
-                        <!-- <td>
-                            <button @click.stop="showEditModal(item)">Edit</button>
-                            <button @click.stop="showDeleteModal(item)">Delete</button>
-                        </td> -->
                     </tr>
                 </tbody>
             </table>
@@ -54,8 +49,8 @@
       <EditTeamModal v-if="showEditTeamModal" :team="getTeamById(selectedTeam)" @close="closeEditTeamModal" @save="editTeam" />
       <DeleteTeamModal v-if="showDeleteTeamModal" :team="getTeamById(selectedTeam)" @close="closeDeleteTeamModal" @confirm="deleteTeam" />
   
-      <AddInventoryModal v-if="showAddModal" :teamId="selectedTeam" :teammates="teammates" @close="closeAddModal" @save="addInventory" />
-      <EditInventoryModal v-if="showEditModal" :teamId="selectedTeam" :item="selectedItem" :teammates="teammates" @close="closeEditModal" @save="editInventory" />
+      <AddInventoryModal v-if="showAddModal" :teamId="selectedTeam" :categories="categories" @close="closeAddModal" @save="addInventory" />
+      <EditInventoryModal v-if="showEditModal" :teamId="selectedTeam" :item="selectedItem" :categories="categories" @close="closeEditModal" @save="editInventory" />
       <DeleteInventoryModal v-if="showDeleteModal" :teamId="selectedTeam" :item="selectedItem" @close="closeDeleteModal" @confirm="deleteInventory" />
     </div>
   </template>
@@ -104,6 +99,7 @@
     },
     mounted() {
       this.fetchTeams();
+      this.fetchCategories();
       document.addEventListener('click', this.handleDocumentClick);
   
       if (this.teams.length > 0) {
@@ -114,228 +110,247 @@
       document.removeEventListener('click', this.handleDocumentClick);
     },
     methods: {
-      addTeam(newTeam) {
+    addTeam(newTeam) {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.post('http://127.0.0.1:8000/api/teams/', newTeam, {
+        axios.post('http://127.0.0.1:8000/api/teams/', newTeam, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchTeams();
             this.closeAddTeamModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при добавлении команды:', error);
-          });
+        });
         }
-      },
-      editTeam(updatedTeam) {
+    },
+    editTeam(updatedTeam) {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.put(`http://127.0.0.1:8000/api/teams/${updatedTeam.id}/`, updatedTeam, {
+        axios.put(`http://127.0.0.1:8000/api/teams/${updatedTeam.id}/`, updatedTeam, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchTeams();
             this.closeEditTeamModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при обновлении команды:', error);
-          });
+        });
         }
-      },
-      deleteTeam() {
+    },
+    deleteTeam() {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.delete(`http://127.0.0.1:8000/api/teams/${this.selectedTeam}/`, {
+        axios.delete(`http://127.0.0.1:8000/api/teams/${this.selectedTeam}/`, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchTeams();
             this.closeDeleteTeamModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при удалении команды:', error);
-          });
+        });
         }
-      },
-  
-      addInventory(newItem) {
+    },
+    addInventory(newItem) {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.post('http://127.0.0.1:8000/api/inventory/', newItem, {
+        axios.post('http://127.0.0.1:8000/api/inventory/', newItem, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchInventory();
             this.closeAddModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при добавлении предмета инвентаря:', error);
-          });
+        });
         }
-      },
-      editInventory(updatedItem) {
+    },
+    editInventory(updatedItem) {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.put(`http://127.0.0.1:8000/api/inventory/${updatedItem.id}/`, updatedItem, {
+        axios.put(`http://127.0.0.1:8000/api/inventory/${updatedItem.id}/`, updatedItem, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchInventory();
             this.closeEditModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при обновлении предмета инвентаря:', error);
-          });
+        });
         }
-      },
-      deleteInventory() {
+    },
+    deleteInventory() {
         const user = AuthService.getCurrentUser();
         if (user && this.selectedItem) {
-          axios.delete(`http://127.0.0.1:8000/api/inventory/${this.selectedItem.id}/`, {
+        axios.delete(`http://127.0.0.1:8000/api/inventory/${this.selectedItem.id}/`, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(() => {
+        })
+        .then(() => {
             this.fetchInventory();
             this.closeDeleteModal();
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при удалении предмета инвентаря:', error);
-          });
+        });
         }
-      },
-  
-      fetchTeams() {
+    },
+    fetchTeams() {
         const user = AuthService.getCurrentUser();
         if (user) {
-          axios.get('http://127.0.0.1:8000/api/teams/', {
+        axios.get('http://127.0.0.1:8000/api/teams/', {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(response => {
+        })
+        .then(response => {
             this.teams = response.data;
             if (this.teams.length > 0) {
-              this.selectedTeam = this.teams[0].id;
-              this.fetchInventory();
+            this.selectedTeam = this.teams[0].id;
+            this.fetchInventoryAndTeammates();
             }
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при получении списка команд:', error);
-          });
+        });
         }
-      },
-      fetchInventory() {
+    },
+    fetchInventoryAndTeammates() {
+        this.fetchInventory();
+        this.fetchTeammates();
+    },
+    fetchInventory() {
         const user = AuthService.getCurrentUser();
         if (user && this.selectedTeam) {
-          axios.get(`http://127.0.0.1:8000/api/inventory/?team=${this.selectedTeam}`, {
+        axios.get(`http://127.0.0.1:8000/api/inventory/?team=${this.selectedTeam}`, {
             headers: {
-              Authorization: `Bearer ${user.access}`
+            Authorization: `Bearer ${user.access}`
             }
-          })
-          .then(response => {
+        })
+        .then(response => {
             this.inventory = response.data.filter(item => item.team === this.selectedTeam);
             this.selectedItem = null;
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             console.error('Ошибка при получении списка инвентаря:', error);
-          });
+        });
         }
-      },
-      getTeamById(id) {
+    },
+    fetchTeammates() {
+        const user = AuthService.getCurrentUser();
+        if (user && this.selectedTeam) {
+        axios.get(`http://127.0.0.1:8000/api/teammates/?team=${this.selectedTeam}`, {
+            headers: {
+            Authorization: `Bearer ${user.access}`
+            }
+        })
+        .then(response => {
+            this.teammates = response.data;
+        })
+        .catch(error => {
+            console.error('Ошибка при получении списка участников команды:', error);
+        });
+        }
+    },
+    // getCategoryTranslation(category) {
+    //     return this.categoryTranslations[category] || category;
+    // },
+    fetchCategories() {
+        const user = AuthService.getCurrentUser();
+        if (user) {
+        axios.get('http://127.0.0.1:8000/api/inventory/categories/', {
+            headers: {
+            Authorization: `Bearer ${user.access}`
+            }
+        })
+        .then(response => {
+            this.categories = response.data;
+            // this.categoryTranslations = this.categories;
+        })
+        .catch(error => {
+            console.error('Ошибка при получении категорий:', error);
+        });
+        }
+    },
+    getTeamById(id) {
         return this.teams.find(team => team.id === id);
-      },
-      getRightsForSelectedTeam() {
+    },
+    getRightsForSelectedTeam() {
         const user = AuthService.getCurrentUser();
         if (!user || !this.selectedTeam) {
-            return 'reader';
+        return 'reader';
         }
-        const teammate = this.teammates.find(tm => tm.user && tm.user.id === user.id );
-        if (teammate) {
-            return teammate.rights;
-        } else {
-            return 'reader';
-        }
-      },
-      selectItem(item) {
-        this.selectedItem = this.selectedItem === item ? null : item;
-      },
-      clearSelection() {
-        if (!this.showEditModal && !this.showDeleteModal) {
-            this.selectedItem = null;
-        }
-      },
-      handleDocumentClick(event) {
-        // Если клик произошел вне таблицы
-        if (!this.$el.contains(event.target)) {
-            this.clearSelection();
-        }
-      },
-
-      openAddModal() {
-        this.showAddModal = true;
-      },
-      closeAddModal() {
-        this.showAddModal = false;
-      },
-      openEditModal() {
-        this.showEditModal = true;
-      },
-      closeEditModal() {
-        this.showEditModal = false;
-      },
-      openDeleteModal() {
-        this.showDeleteModal = true;
-      },
-      closeDeleteModal() {
-        this.showDeleteModal = false;
-      },
-  
-      openAddTeamModal() {
-        this.showAddTeamModal = true;
-      },
-      closeAddTeamModal() {
-        this.showAddTeamModal = false;
-      },
-      openEditTeamModal() {
-        this.showEditTeamModal = true;
-      },
-      closeEditTeamModal() {
-        this.showEditTeamModal = false;
-      },
-      openDeleteTeamModal() {
-        this.showDeleteTeamModal = true;
-      },
-      closeDeleteTeamModal() {
-        this.showDeleteTeamModal = false;
-      },
-  
-      handleDocumentClick(event) {
-        if (!this.$el.contains(event.target)) {
-          this.clearSelection();
-        }
-      },
-    //   getRightsForSelectedTeam() {
-    //     const selectedTeam = this.teams.find(team => team.id === this.selectedTeam);
-    //     return selectedTeam ? selectedTeam.user_rights : null;
-    //   },
-    //   getTeamById(id) {
-    //     return this.teams.find(team => team.id === id);
-    //   },
+        const teammate = this.teammates.find(tm => tm.user && tm.user.id === user.id);
+        return teammate ? teammate.rights : 'reader';
     },
+    selectItem(item) {
+        this.selectedItem = this.selectedItem === item ? null : item;
+    },
+    clearSelection() {
+        if (!this.showEditModal && !this.showDeleteModal) {
+        this.selectedItem = null;
+        }
+    },
+    handleDocumentClick(event) {
+        if (!this.$el.contains(event.target)) {
+        this.clearSelection();
+        }
+    },
+    openAddTeamModal() {
+        this.showAddTeamModal = true;
+    },
+    closeAddTeamModal() {
+        this.showAddTeamModal = false;
+    },
+    openEditTeamModal() {
+        this.showEditTeamModal = true;
+    },
+    closeEditTeamModal() {
+        this.showEditTeamModal = false;
+    },
+    openDeleteTeamModal() {
+        this.showDeleteTeamModal = true;
+    },
+    closeDeleteTeamModal() {
+        this.showDeleteTeamModal = false;
+    },
+    openAddModal() {
+        this.showAddModal = true;
+    },
+    closeAddModal() {
+        this.showAddModal = false;
+    },
+    openEditModal() {
+        this.showEditModal = true;
+    },
+    closeEditModal() {
+        this.showEditModal = false;
+    },
+    openDeleteModal() {
+        this.showDeleteModal = true;
+    },
+    closeDeleteModal() {
+        this.showDeleteModal = false;
+    },
+  }
+
   };
   </script>
   
