@@ -5,7 +5,7 @@
         <form @submit.prevent="saveTeam">
           <div class="form-group">
             <label for="teamname">Название команды</label>
-            <input type="text" v-model="teamname" id="teamname" required />
+            <input type="text" v-model="team.teamname" id="teamname" required />
           </div>
           <button type="submit">Сохранить</button>
           <button type="button" @click="$emit('close')">Отмена</button>

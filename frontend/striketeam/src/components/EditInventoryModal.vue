@@ -22,12 +22,11 @@
           </div>
           <div class="form-group">
             <label for="category">Категория</label>
-            <select v-model="item.category" id="category" v-if="categories.length">
+            <select v-model="item.category" id="category">
               <option v-for="category in categories" :key="category[0]" :value="category[0]">
                 {{ category[1] }}
               </option>
             </select>
-            <span v-else>Загрузка категорий...</span>
           </div>
           <button type="submit">Сохранить</button>
           <button type="button" @click="close">Отмена</button>

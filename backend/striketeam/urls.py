@@ -24,8 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/users/', UserListView.as_view(), name='user-list'),
-    path('api/user/', UserDetailView.as_view(), name='user-detail'),
+    # path('api/user/', UserDetailView.as_view(), name='user-detail'),
     # path('api/user/delete/', UserDetailView.as_view(), name='delete-user'),
-    path('api/user/delete/', DeleteUserView, name='delete-user'),
+    # path('api/user/delete/', DeleteUserView, name='delete-user'),
     # path('admin/logout/', logout_view, name='logout'),
 ]

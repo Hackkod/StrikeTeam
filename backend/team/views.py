@@ -43,8 +43,11 @@ class TeammatesViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        teammates = Teammates.objects.filter(team__teammates__user=user).distinct()
-        return teammates
+        queryset = Teammates.objects.filter(team__teammates__user=user).distinct()
+        team_id = self.request.query_params.get('team')
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+        return queryset
 
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all()
@@ -88,18 +91,18 @@ def register(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
+# class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = User.objects.all()
+#     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+#     def get_object(self):
+#         return self.request.user
 
-    def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        print(f"Deleting user: {user.username}")  # Debugging print
-        user.delete()
-        return Response(status=204)
+#     def destroy(self, request, *args, **kwargs):
+#         user = self.get_object()
+#         print(f"Deleting user: {user.username}")  # Debugging print
+#         user.delete()
+#         return Response(status=204)
 
     
     

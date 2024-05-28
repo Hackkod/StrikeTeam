@@ -48,7 +48,7 @@
       <AddTeamModal v-if="showAddTeamModal" @close="closeAddTeamModal" @save="addTeam" />
       <EditTeamModal v-if="showEditTeamModal" :team="getTeamById(selectedTeam)" @close="closeEditTeamModal" @save="editTeam" />
       <DeleteTeamModal v-if="showDeleteTeamModal" :team="getTeamById(selectedTeam)" @close="closeDeleteTeamModal" @confirm="deleteTeam" />
-  
+
       <AddInventoryModal v-if="showAddModal" :teamId="selectedTeam" :categories="categories" @close="closeAddModal" @save="addInventory" />
       <EditInventoryModal v-if="showEditModal" :teamId="selectedTeam" :item="selectedItem" :categories="categories" @close="closeEditModal" @save="editInventory" />
       <DeleteInventoryModal v-if="showDeleteModal" :teamId="selectedTeam" :item="selectedItem" @close="closeDeleteModal" @confirm="deleteInventory" />
@@ -99,7 +99,6 @@
     },
     mounted() {
       this.fetchTeams();
-      this.fetchCategories();
       document.addEventListener('click', this.handleDocumentClick);
   
       if (this.teams.length > 0) {
@@ -115,7 +114,7 @@
         if (user) {
         axios.post('http://127.0.0.1:8000/api/teams/', newTeam, {
             headers: {
-            Authorization: `Bearer ${user.access}`
+              Authorization: `Bearer ${user.access}`
             }
         })
         .then(() => {
@@ -217,7 +216,7 @@
         if (user) {
         axios.get('http://127.0.0.1:8000/api/teams/', {
             headers: {
-            Authorization: `Bearer ${user.access}`
+              Authorization: `Bearer ${user.access}`
             }
         })
         .then(response => {
@@ -262,30 +261,10 @@
             }
         })
         .then(response => {
-            this.teammates = response.data;
+            this.teammates = response.data.filter(teammate => teammate.team === this.selectedTeam);
         })
         .catch(error => {
             console.error('Ошибка при получении списка участников команды:', error);
-        });
-        }
-    },
-    // getCategoryTranslation(category) {
-    //     return this.categoryTranslations[category] || category;
-    // },
-    fetchCategories() {
-        const user = AuthService.getCurrentUser();
-        if (user) {
-        axios.get('http://127.0.0.1:8000/api/inventory/categories/', {
-            headers: {
-            Authorization: `Bearer ${user.access}`
-            }
-        })
-        .then(response => {
-            this.categories = response.data;
-            // this.categoryTranslations = this.categories;
-        })
-        .catch(error => {
-            console.error('Ошибка при получении категорий:', error);
         });
         }
     },
