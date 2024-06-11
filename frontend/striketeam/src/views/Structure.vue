@@ -16,17 +16,18 @@
         <button @click="openEditTeamModal"><i class="fa fa-pen"></i></button>
         <button @click="openDeleteTeamModal"><i class="fa fa-trash"></i></button>
       </div>
-      <!-- <div class="table-toolbar">
+      <div class="table-toolbar">
         <button @click="viewMode = 'hierarchy'" :class="{ active: viewMode === 'hierarchy' }">
-          &#x1F5C3;
+          <img src="../assets/structure_icon_smaller.png" />
+          <!-- &#x1F5C3; -->
         </button>
         <button @click="viewMode = 'table'" :class="{ active: viewMode === 'table' }">
-          &#x1F4C4;
+          <img src="../assets/table_icon_smaller.png" />
+          <!-- &#x1F4C4; -->
         </button>
-      </div> -->
+      </div>
       <div class="table-container">
-        <!-- <div v-if="viewMode === 'table'" class="table-view"> -->
-        <div class="table-view">
+        <div v-if="viewMode === 'table'" class="table-view">
           <table>
             <thead>
               <tr>
@@ -48,9 +49,9 @@
             </tbody>
           </table>
         </div>
-        <!-- <div v-else class="hierarchy-view"> -->
-          <!-- Иерархическое представление будет реализовано позже -->
-        <!-- </div> -->
+        <div v-else class="hierarchy-view">
+          Иерархическое представление будет реализовано позже
+        </div>
         <div class="action-icons">
           <button @click="openAddModal" v-if="canAdd"><i class="fa fa-plus"></i></button>
           <button @click="openEditModal" v-if="canEdit" :disabled="!selectedTeammate"><i class="fa fa-pen"></i></button>
@@ -366,12 +367,24 @@ export default {
   border: none;
   border-radius: 5px;
   font-size: 16px;
+  cursor: pointer;
+}
+
+.team-selector select:hover {
+  background-color: #2e2d3e;
 }
 
 .team-selector select option {
   margin: 10px 20px;
   background-color: #2B2A3B;
   color: white;
+}
+
+.team-selector button:hover {
+  /* color: #9B59B6; */
+  /* background-color: #9B59B6; */
+  background-color: #b992db;
+  cursor: pointer;
 }
 
 .table-toolbar {
@@ -383,14 +396,30 @@ export default {
 .table-toolbar button {
   background: none;
   border: none;
-  color: white;
+  border-radius: 5px;
   font-size: 24px;
   cursor: pointer;
   margin-left: 10px;
+  justify-content: center;
+  position: relative;
+  width: 50px;
+}
+
+.table-toolbar button img {
+  display: block;
+  height: 24px;
+  filter: grayscale(100%);
+  margin: 5px auto;
+}
+
+.table-toolbar button.active img {
+  display: block;
+  margin: auto;
+  filter: none;
 }
 
 .table-toolbar button.active {
-  color: #9B59B6;
+  /* background-color: #5f5d86; */
 }
 
 .table-container {
@@ -409,6 +438,8 @@ export default {
   width: 100%;
   border-collapse: collapse;
   background-color: #ECF0F1;
+  /* background-color: #CDCAF0; */
+  /* border-radius: 5px; */
 }
 
 .table-view th,
@@ -417,6 +448,18 @@ export default {
   border: 1px solid #bdc3c7;
   text-align: left;
 }
+
+/* .table-view tr {
+  margin: 10px;
+} */
+/* 
+.table-view th {
+  background-color: #CDCAF0;
+}
+
+.table-view td {
+  background-color: #E9E7FF;
+} */
 
 .table-view tr.selected {
   background-color: #9B59B6;

@@ -351,7 +351,7 @@
     justify-content: flex-start;
     margin-bottom: 20px;
   }
-  
+
   .team-selector select {
     padding: 10px 20px;
     background-color: #2B2A3B;
@@ -359,12 +359,24 @@
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    cursor: pointer;
   }
-  
+
+  .team-selector select:hover {
+    background-color: #2e2d3e;
+  }
+
   .team-selector select option {
     margin: 10px 20px;
     background-color: #2B2A3B;
     color: white;
+  }
+
+  .team-selector button:hover {
+    /* color: #9B59B6; */
+    /* background-color: #9B59B6; */
+    background-color: #b992db;
+    cursor: pointer;
   }
 
   .table-container {
@@ -393,6 +405,7 @@
 }
 
 .table-view tr.selected {
+  /* background-color: #a777d0; */
   background-color: #9B59B6;
   color: white;
 }

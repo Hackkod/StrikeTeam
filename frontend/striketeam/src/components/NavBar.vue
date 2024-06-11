@@ -60,7 +60,7 @@
   
   .navitem {
     display: block;
-    padding: 10px;
+    padding: 10px 20px;
     color: #ECF0F1;
     text-decoration: none;
     text-align: center;

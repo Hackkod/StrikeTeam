@@ -7,13 +7,13 @@
         <h2>РЕГИСТРАЦИЯ</h2>
         <form @submit.prevent="register">
           <div class="textbox">
-            <input type="text" placeholder="Логин" v-model="username" required>
+            <input type="text" placeholder="Логин" v-model="username" autocomplete="off" required>
           </div>
           <div class="textbox">
-            <input type="password" placeholder="Пароль" v-model="password" required>
+            <input type="password" placeholder="Пароль" v-model="password" autocomplete="new-password" required>
           </div>
           <div class="textbox">
-            <input type="password" placeholder="Повторите пароль" v-model="confirmPassword" required>
+            <input type="password" placeholder="Повторите пароль" v-model="confirmPassword" autocomplete="new-password" required>
           </div>
           <button type="submit" class="btn">Регистрация</button>
           <router-link to="/login" class="register-link">Уже есть аккаунт? Войти</router-link>

@@ -7,10 +7,13 @@ import AuthService from './services/auth';
 
 export default {
   created() {
-    const user = AuthService.getCurrentUser();
-    if (!user) {
+    if (!AuthService.isAuthenticated()) {
       this.$router.push('/login');
     }
+    // const user = AuthService.getCurrentUser();
+    // if (!user) {
+    //   this.$router.push('/login');
+    // }
   }
 };
 </script>

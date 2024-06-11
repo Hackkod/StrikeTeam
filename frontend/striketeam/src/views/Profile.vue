@@ -12,6 +12,7 @@
               v-model="user.username"
               id="username"
               @input="handleInputChange"
+              autocomplete="off"
             />
             <!-- <a href="#" class="edit-link" @click.prevent="openEditUsernameModal">Редактировать</a> -->
           </div>
@@ -22,6 +23,7 @@
               v-model="user.password"
               id="password"
               @input="handleInputChange"
+              autocomplete="new-password"
             />
           </div>
           <button type="button" @click="togglePasswordVisibility" class="password-toggle">Показать/Скрыть пароль</button>

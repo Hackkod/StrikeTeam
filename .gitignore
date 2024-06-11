@@ -4,3 +4,5 @@ venv
 db.sqlite3
 .idea
 striketeam2.json
+backend\README.md
+frontend\README.md
