@@ -1,11 +1,11 @@
 <template>
     <head>
-      <!-- Другие ваши теги -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <div class="inventory-container" @click.self="clearSelection">
       <NavBar />
       <main class="main-content">
+        <!--  to do: вынести team-selector в отдельный компонент-->
         <div class="team-selector">
           <select v-model="selectedTeam" @change="fetchInventoryAndTeammates">
             <option v-for="team in teams" :key="team.id" :value="team.id">

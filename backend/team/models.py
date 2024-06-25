@@ -49,16 +49,16 @@ class Inventory(models.Model):
     inventname = models.CharField(max_length=255, verbose_name='Наименование')
     amount = models.IntegerField(default=1, verbose_name='Количество')
     teammate_name = models.CharField(blank=True, default='Команда', max_length=255, verbose_name='Имя владельца', null=True)
-    
+
     CATEGORIES = [
-        ('pyrotechnics', 'Пиротехника'),
-        ('guns', 'Привода'),
-        ('food', 'Продовольствие'),
-        ('consumables', 'Расходники'),
-        ('Props', 'Реквизит'),
-        ('sleepeng_gear', 'Спальное снаряжение'),
-        ('equipment', 'Экипировка'),
-        ('other', 'Прочее'),
+        ('Пиротехника', 'pyrotechnics'),
+        ('Привода', 'guns'),
+        ('Продовольствие', 'food'),
+        ('Расходники', 'consumables'),
+        ('Реквизит', 'props'),
+        ('Спальное снаряжение', 'sleepeng_gear'),
+        ('Экипировка', 'equipment'),
+        ('Прочее', 'other'),
     ]
     category = models.CharField(choices=CATEGORIES, max_length=255, verbose_name='Категория')
     

@@ -24,7 +24,7 @@
             <label for="category">Категория</label>
             <select v-model="item.category" id="category">
                 <option v-for="category in categories" :key="category[0]" :value="category[0]">
-                  {{ category[1] }}
+                  {{ category[0] }}
                 </option>
             </select>
           </div>

@@ -1,11 +1,11 @@
 <template>
   <head>
-    <!-- Другие ваши теги -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   </head>
   <div class="structure-container" @click.self="clearSelection">
     <NavBar />
     <main class="main-content">
+      <!--  to do: вынести team-selector в отдельный компонент-->
       <div class="team-selector">
         <select v-model="selectedTeam" @change="fetchTeammates">
           <option v-for="team in teams" :key="team.id" :value="team.id">
@@ -67,10 +67,6 @@
     <AddTeammateModal v-if="showAddModal" :teamId="selectedTeam" @close="closeAddModal" @save="addTeammate" />
     <EditTeammateModal v-if="showEditModal" :teamId="selectedTeam" :teammate="selectedTeammate" @close="closeEditModal" @save="editTeammate" />
     <DeleteTeammateModal v-if="showDeleteModal" :teamId="selectedTeam" :teammate="selectedTeammate" @close="closeDeleteModal" @confirm="deleteTeammate" />
-
-    <!-- <AddTeammateModal v-if="isAddModalOpen" :teamId="selectedTeam" @save="addTeammate" @close="closeAddModal" />
-    <EditTeammateModal v-if="isEditModalOpen" :teammate="selectedTeammate" @save="updateTeammate" @close="closeEditModal" />
-    <DeleteTeammateModal v-if="isDeleteModalOpen" :teammate="selectedTeammate" @confirm="deleteTeammate" @close="closeDeleteModal" /> -->
   </div>
 </template>
 
