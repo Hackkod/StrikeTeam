@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Teams(models.Model):
     teamname = models.CharField(max_length=255, verbose_name='Название команды')
-    # teamamount = models.IntegerField(default=0, verbose_name='Количество участников')
 
     def __str__(self):
         return self.teamname
+
 
 class Teammates(models.Model):
     team = models.ForeignKey('Teams', on_delete=models.CASCADE, verbose_name='Команда')
@@ -39,7 +40,8 @@ class Teammates(models.Model):
             self.parentname = '-'
             
         super().save(*args, **kwargs)
-    
+
+
 class Inventory(models.Model):
     team = models.ForeignKey('Teams', on_delete=models.CASCADE, verbose_name='Команда')
     teammate = models.ForeignKey('Teammates', blank=True, null=True, on_delete=models.CASCADE, verbose_name='Владелец')
@@ -68,6 +70,5 @@ class Inventory(models.Model):
             self.teammate_name = self.teammate.name
         else:
             self.teammate_name = 'Команда'
-            
         super().save(*args, **kwargs)
     
