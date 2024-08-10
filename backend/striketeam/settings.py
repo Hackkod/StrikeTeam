@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^$fg9!(6ge@+j+xpinv+fg(8pee8=n=b8ei-45(v2jcv2@@irs'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'True'
 
 ALLOWED_HOSTS = []
 
@@ -82,7 +82,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'striketeam',
         'USER': 'striketeam',
-        'PASSWORD': 'striketeam'
+        'PASSWORD': 'striketeam',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
@@ -158,4 +160,9 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
-CORS_ORIGIN_ALLOW_ALL = True  # Для разработки. В продакшн окружении используйте CORS_ORIGIN_WHITELIST
+CORS_ORIGIN_ALLOW_ALL = True
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TIMEZONE = TIME_ZONE

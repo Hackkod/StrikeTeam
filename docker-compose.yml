@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: striketeam
+      POSTGRES_USER: striketeam
+      POSTGRES_PASSWORD: striketeam
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+    command: npm run serve -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "8080:8080"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build:
+      context: ./backend
+    command: celery -A striketeam worker -l info
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+
+  celery-beat:
+    build:
+      context: ./backend
+    command: celery -A striketeam beat -l info
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
