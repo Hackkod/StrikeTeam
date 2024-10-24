@@ -67,6 +67,5 @@
   </script>
   
   <style scoped>
-  /* Ваши стили здесь */
   </style>
   
