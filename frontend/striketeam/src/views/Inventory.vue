@@ -5,7 +5,6 @@
     <div class="inventory-container" @click.self="clearSelection">
       <NavBar />
       <main class="main-content">
-        <!--  to do: вынести team-selector в отдельный компонент-->
         <div class="team-selector">
           <select v-model="selectedTeam" @change="fetchInventoryAndTeammates">
             <option v-for="team in teams" :key="team.id" :value="team.id">
@@ -20,20 +19,25 @@
           <div class="table-view">
             <table>
                 <thead>
-                    <tr>
-                        <th>Наименование</th>
-                        <th>Количество</th>
-                        <th>Владелец</th>
-                        <th>Категория</th>
-                    </tr>
+                  <tr>
+                    <th>Наименование</th>
+                    <th>Количество</th>
+                    <th>Владелец</th>
+                    <th>Категория</th>
+                  </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in inventory" :key="item.id" @click.stop="selectItem(item)" :class="{ selected: item === selectedItem }">
-                        <td>{{ item.inventname }}</td>
-                        <td>{{ item.amount }}</td>
-                        <td>{{ item.teammate_name }}</td>
-                        <td>{{ item.category }}</td>
-                    </tr>
+                  <tr
+                    v-for="item in inventory"
+                    :key="item.id"
+                    @click.stop="selectItem(item)"
+                    :class="{ selected: item === selectedItem }"
+                  >
+                    <td>{{ item.inventname }}</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.teammate_name }}</td>
+                    <td>{{ item.category }}</td>
+                  </tr>
                 </tbody>
             </table>
           </div>
@@ -67,7 +71,15 @@
   import DeleteInventoryModal from '../components/DeleteInventoryModal.vue';
   
   export default {
-    components: { NavBar, AddTeamModal, EditTeamModal, DeleteTeamModal, AddInventoryModal, EditInventoryModal, DeleteInventoryModal },
+    components: {
+      NavBar,
+      AddTeamModal,
+      EditTeamModal,
+      DeleteTeamModal,
+      AddInventoryModal,
+      EditInventoryModal,
+      DeleteInventoryModal
+    },
     data() {
       return {
         teams: [],
@@ -292,42 +304,18 @@
         this.clearSelection();
         }
     },
-    openAddTeamModal() {
-        this.showAddTeamModal = true;
-    },
-    closeAddTeamModal() {
-        this.showAddTeamModal = false;
-    },
-    openEditTeamModal() {
-        this.showEditTeamModal = true;
-    },
-    closeEditTeamModal() {
-        this.showEditTeamModal = false;
-    },
-    openDeleteTeamModal() {
-        this.showDeleteTeamModal = true;
-    },
-    closeDeleteTeamModal() {
-        this.showDeleteTeamModal = false;
-    },
-    openAddModal() {
-        this.showAddModal = true;
-    },
-    closeAddModal() {
-        this.showAddModal = false;
-    },
-    openEditModal() {
-        this.showEditModal = true;
-    },
-    closeEditModal() {
-        this.showEditModal = false;
-    },
-    openDeleteModal() {
-        this.showDeleteModal = true;
-    },
-    closeDeleteModal() {
-        this.showDeleteModal = false;
-    },
+    openAddTeamModal() { this.showAddTeamModal = true; },
+    closeAddTeamModal() { this.showAddTeamModal = false; },
+    openEditTeamModal() { this.showEditTeamModal = true; },
+    closeEditTeamModal() { this.showEditTeamModal = false; },
+    openDeleteTeamModal() { this.showDeleteTeamModal = true; },
+    closeDeleteTeamModal() { this.showDeleteTeamModal = false; },
+    openAddModal() { this.showAddModal = true; },
+    closeAddModal() { this.showAddModal = false; },
+    openEditModal() { this.showEditModal = true; },
+    closeEditModal() { this.showEditModal = false; },
+    openDeleteModal() { this.showDeleteModal = true; },
+    closeDeleteModal() { this.showDeleteModal = false; },
   }
 
   };
@@ -345,7 +333,7 @@
     padding: 20px;
     background-color: #17141F;
   }
-  
+
   .team-selector {
     display: flex;
     justify-content: flex-start;

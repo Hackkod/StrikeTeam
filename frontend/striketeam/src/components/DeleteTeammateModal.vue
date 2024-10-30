@@ -1,10 +1,12 @@
 <template>
-    <div class="modal-overlay" @click.self="close">
+    <div class="modal-overlay" @dblclick.self="close">
       <div class="modal-content">
         <h2>Удалить тиммейта</h2>
         <p>Вы уверены, что хотите удалить тиммейта {{ teammate.name }}?</p>
-        <button @click="confirm">Удалить</button>
-        <button @click="close">Отмена</button>
+        <div class="button-group">
+          <el-button type="primary" @click="$emit('confirm')">Да</el-button>
+          <el-button @click="$emit('close')">Нет</el-button>
+        </div>
       </div>
     </div>
   </template>
@@ -16,15 +18,7 @@
         type: Object,
         required: true,
       },
-    },
-    methods: {
-      confirm() {
-        this.$emit('confirm');
-      },
-      close() {
-        this.$emit('close');
-      },
-    },
+    }
   };
   </script>
   
@@ -45,11 +39,17 @@
     background: white;
     padding: 20px;
     border-radius: 5px;
-    width: 300px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
-  
-  .modal-content p {
-    margin-bottom: 20px;
+
+  .button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
   }
   </style>
   

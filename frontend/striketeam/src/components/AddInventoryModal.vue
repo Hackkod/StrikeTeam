@@ -1,36 +1,49 @@
 <template>
-    <div class="modal-overlay" @click.self="close">
+    <div class="modal-overlay" @dblclick.self="close">
       <div class="modal-content">
         <h2>Добавить предмет инвентаря</h2>
-        <form @submit.prevent="save">
-          <div class="form-group">
-            <label for="inventname">Наименование</label>
-            <input type="text" v-model="item.inventname" id="inventname" required />
+        <el-form ref="form" :model="item" :rules="rules">
+          <el-form-item label="Наименование" prop="inventname">
+            <el-input
+              v-model="item.inventname"
+              id="inventname"
+              placeholder="Введите название"
+              clearable
+            />
+          </el-form-item>
+
+          <el-form-item label="Количество" prop="amount">
+            <el-input-number v-model="item.amount" id="amount" :min="1" />
+          </el-form-item>
+
+          <el-form-item label="Владелец" prop="teammate">
+            <el-select v-model="item.teammate" placeholder="Выберите владельца">
+              <el-option :value="null" label="Команда" />
+              <el-option
+                v-for="teammate in teammates"
+                :key="teammate.id"
+                :value="teammate.id"
+                :label="teammate.name"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="Категория" prop="category">
+            <el-select v-model="item.category" placeholder="Выберите категорию">
+              <el-option
+                v-for="category in categories"
+                :key="category[0]"
+                :value="category[0]"
+                :label="category[0]"
+              />
+            </el-select>
+          </el-form-item>
+
+          <div class="button-group">
+            <el-button type="primary" @click="save">Сохранить</el-button>
+            <el-button @click="close">Отмена</el-button>
           </div>
-          <div class="form-group">
-            <label for="amount">Количество</label>
-            <input type="number" v-model="item.amount" id="amount" required />
-          </div>
-          <div class="form-group">
-            <label for="teammate">Владелец</label>
-            <select v-model="item.teammate" id="teammate">
-              <option :value="null">Команда</option>
-              <option v-for="teammate in teammates" :key="teammate.id" :value="teammate.id">
-                {{ teammate.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="category">Категория</label>
-            <select v-model="item.category" id="category">
-                <option v-for="category in categories" :key="category[0]" :value="category[0]">
-                  {{ category[0] }}
-                </option>
-            </select>
-          </div>
-          <button type="submit">Сохранить</button>
-          <button type="button" @click="close">Отмена</button>
-        </form>
+        </el-form>
       </div>
     </div>
   </template>
@@ -52,7 +65,12 @@
           teammate: null,
           category: null,
           team: this.teamId,
-        }
+        },
+        rules: {
+          inventname: [{ required: true, message: 'Введите название предмета', trigger: 'blur' }],
+          amount: [{ required: true, message: 'Укажите количество', trigger: 'blur' }],
+          category: [{ required: true, message: 'Укажите категорию', trigger: 'blur' }],
+        },
       };
     },
     methods: {
@@ -116,23 +134,17 @@
   background: white;
   padding: 20px;
   border-radius: 5px;
-  width: 300px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 </style>
   

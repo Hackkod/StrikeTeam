@@ -5,7 +5,6 @@
   <div class="structure-container" @click.self="clearSelection">
     <NavBar />
     <main class="main-content">
-      <!--  to do: вынести team-selector в отдельный компонент-->
       <div class="team-selector">
         <select v-model="selectedTeam" @change="fetchTeammates">
           <option v-for="team in teams" :key="team.id" :value="team.id">
@@ -82,7 +81,7 @@ import EditTeammateModal from '../components/EditTeammateModal.vue';
 import DeleteTeammateModal from '../components/DeleteTeammateModal.vue';
 
 export default {
-  components: { NavBar, AddTeamModal, EditTeamModal, DeleteTeamModal, AddTeammateModal, EditTeammateModal, DeleteTeammateModal },
+  components: {NavBar, AddTeamModal, EditTeamModal, DeleteTeamModal, AddTeammateModal, EditTeammateModal, DeleteTeammateModal },
   data() {
     return {
       teams: [],
@@ -152,7 +151,7 @@ export default {
           this.closeEditTeamModal();
         })
         .catch(error => {
-          console.error('Ошибка при обновлении команды:', error);
+          console.error('Ошибка при изменении команды:', error);
         });
       }
     },
@@ -295,44 +294,18 @@ export default {
     },
 
     // Методы для форм команд
-    openAddTeamModal() {
-      this.showAddTeamModal = true;
-    },
-    closeAddTeamModal() {
-      this.showAddTeamModal = false;
-    },
-    openEditTeamModal() {
-      this.showEditTeamModal = true;
-    },
-    closeEditTeamModal() {
-      this.showEditTeamModal = false;
-    },
-    openDeleteTeamModal() {
-      this.showDeleteTeamModal = true;
-    },
-    closeDeleteTeamModal() {
-      this.showDeleteTeamModal = false;
-    },
-
-    // Методы для форм тиммейтов
-    openAddModal() {
-      this.showAddModal = true;
-    },
-    closeAddModal() {
-      this.showAddModal = false;
-    },
-    openEditModal() {
-      this.showEditModal = true;
-    },
-    closeEditModal() {
-      this.showEditModal = false;
-    },
-    openDeleteModal() {
-      this.showDeleteModal = true;
-    },
-    closeDeleteModal() {
-      this.showDeleteModal = false;
-    }
+    openAddTeamModal() { this.showAddTeamModal = true; },
+    closeAddTeamModal() { this.showAddTeamModal = false; },
+    openEditTeamModal() { this.showEditTeamModal = true; },
+    closeEditTeamModal() { this.showEditTeamModal = false; },
+    openDeleteTeamModal() { this.showDeleteTeamModal = true; },
+    closeDeleteTeamModal() { this.showDeleteTeamModal = false; },
+    openAddModal() { this.showAddModal = true; },
+    closeAddModal() { this.showAddModal = false; },
+    openEditModal() { this.showEditModal = true; },
+    closeEditModal() { this.showEditModal = false; },
+    openDeleteModal() { this.showDeleteModal = true; },
+    closeDeleteModal() { this.showDeleteModal = false; },
   }
 };
 </script>
