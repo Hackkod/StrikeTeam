@@ -34,7 +34,7 @@
           </el-form-item>
 
           <div class="button-group">
-            <el-button type="primary" @click="submitForm">Сохранить</el-button>
+            <el-button type="primary" @click="save">Сохранить</el-button>
             <el-button @click="close">Отмена</el-button>
           </div>
         </el-form>

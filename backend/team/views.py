@@ -57,6 +57,14 @@ class TeammatesViewSet(viewsets.ModelViewSet):
             )
         return queryset
 
+    def perform_destroy(self, instance):
+        team = instance.team
+        instance.delete()
+
+        # Если администраторов больше нет, удаляем команду
+        if not team.teammates_set.filter(rights='admin').exists():
+            team.delete()
+
 
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all()
