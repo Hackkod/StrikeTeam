@@ -9,9 +9,9 @@ import AuthService from '../services/auth';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
-  { path: '/structure', name: 'Structure', component: Structure, meta: { requiresAuth: true } },
-  { path: '/inventory', name: 'Inventory', component: Inventory, meta: { requiresAuth: true } },
-  { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true } },
+  { path: '/structure', name: 'Structure', component: Structure, meta: { requiresAuth: true, activeIndex: 0, } },
+  { path: '/inventory', name: 'Inventory', component: Inventory, meta: { requiresAuth: true, activeIndex: 1, } },
+  { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true, activeIndex: 2, } },
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
 ];

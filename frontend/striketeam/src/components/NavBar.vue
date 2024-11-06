@@ -5,10 +5,10 @@
       </div>
       <div class="navbar-line"></div>
       <nav>
-        <router-link to="/structure" class="navitem">Структура</router-link>
-        <router-link to="/inventory" class="navitem">Инвентарь</router-link>
-        <router-link to="/profile" class="navitem">Профиль</router-link>
-        <router-link to="#" class="navitem" @click.native="logout">Выход</router-link>
+        <div v-for="(item, index) in menuItems" :key="index">
+          <router-link to="/structure" class="navitem" :class="{ active: activeIndexPage === index }" @click="setActive(index)">{{item.name}}</router-link>
+        </div>
+        <div><router-link to="#" class="navitem"  @click.native="logout">Выход</router-link></div>
       </nav>
     </aside>
   </template>
@@ -17,7 +17,23 @@
   import AuthService from '../services/auth';
   
   export default {
+    name: "NavBar",
+    data() {
+      return {
+        activeIndexPage: this.$route.meta.activeIndex || 0,
+        menuItems: [
+          { name: "Структура", route: "/structure" },
+          { name: "Инвентарь", route: "/inventory" },
+          { name: "Профиль", route: "/profile" },
+        ],
+      }
+    },
     methods: {
+      setActive(index) {
+        this.activeIndexPage = index;
+        const selectedRoute = this.menuItems[index].route;
+        this.$router.push({ path: selectedRoute });
+      },
       logout() {
         AuthService.logout();
         this.$router.push('/login');
@@ -69,7 +85,7 @@
     cursor: pointer;
   }
   
-  .navitem:hover {
+  .navitem.active, .navitem:hover {
     background-color: #6C5B7B;
   }
   </style>
