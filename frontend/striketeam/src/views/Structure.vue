@@ -49,7 +49,7 @@
           </table>
         </div>
         <div v-else class="hierarchy-view">
-          Иерархическое представление будет реализовано позже
+          Иерархическое представление будет реализовано позже <br><br> А может и не будет xD
         </div>
         <div class="action-icons">
           <button @click="openAddModal" v-if="canAdd"><i class="fa fa-plus"></i></button>
