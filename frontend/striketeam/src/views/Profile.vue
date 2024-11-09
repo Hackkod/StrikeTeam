@@ -6,51 +6,32 @@
       <div class="profile-container">
         <form @submit.prevent="saveChanges">
           <div class="form-group">
-            <label for="username">Логин:</label>
-            <input
-              type="text"
-              v-model="user.username"
+            <label for="username">Изменить логин:</label>
+            <el-input
               id="username"
-              @input="handleInputChange"
-              autocomplete="off"
+              name="username"
+              class="input"
+              v-model="username"
+              placeholder="логин"
+              @input="enableSaveButton"
             />
-            <!-- <a href="#" class="edit-link" @click.prevent="openEditUsernameModal">Редактировать</a> -->
           </div>
-          <div class="form-group password-group">
-            <label for="password">Пароль:</label>
-            <input
-              :type="passwordFieldType"
-              v-model="user.password"
+          <div class="form-group">
+            <label for="username">Изменить пароль:</label>
+            <el-input
               id="password"
-              @input="handleInputChange"
+              class="input"
+              v-model="password"
+              type="password"
+              placeholder="пароль"
+              show-password
+              @input="enableSaveButton"
               autocomplete="new-password"
             />
           </div>
-          <button type="button" @click="togglePasswordVisibility" class="password-toggle">Показать/Скрыть пароль</button>
-          <!-- <a href="#" class="delete-account" @click.prevent="openDeleteAccountModal">Удалить аккаунт</a> -->
-          <!-- <button type="submit" :disabled="!hasChanges" class="save-button">Сохранить</button> -->
+           <a href="#" class="delete-account" @click.prevent="confirmDelete">Удалить аккаунт</a>
+           <button type="submit" :disabled="!isModified" class="save-button">Сохранить</button>
         </form>
-      </div>
-    </div>
-
-    <!-- Модальное окно редактирования логина -->
-    <div v-if="showEditUsernameModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="closeEditUsernameModal">&times;</span>
-        <h2>Редактировать логин</h2>
-        <input type="text" v-model="newUsername" />
-        <button @click="saveUsername">Сохранить</button>
-      </div>
-    </div>
-
-    <!-- Модальное окно подтверждения удаления аккаунта -->
-    <div v-if="showDeleteAccountModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="closeDeleteAccountModal">&times;</span>
-        <h2>Удалить аккаунт</h2>
-        <p>Вы уверены, что хотите удалить свой аккаунт?</p>
-        <button @click="confirmDeleteAccount">Да</button>
-        <button @click="closeDeleteAccountModal">Нет</button>
       </div>
     </div>
   </div>
@@ -58,137 +39,74 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue';
+import axios from 'axios';
+import { ref } from 'vue';
+import AuthService from "@/services/auth";
 
 export default {
   name: 'Profile',
   components: {
     NavBar
   },
-  data() {
+  setup() {
+    const username = ref("");
+    const password = ref("");
+    const isModified = ref(false);
+
+    const enableSaveButton = () => {
+      isModified.value = true;
+    };
+
+    const saveChanges = async () => {
+      try {
+        const user = AuthService.getCurrentUser();
+        await axios.patch("http://127.0.0.1:8000/api/user/update/", {
+          username: username.value,
+          password: password.value,
+        },{
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        });
+        alert("Изменения сохранены");
+        isModified.value = false;
+      } catch (error) {
+        console.error("Ошибка при сохранении данных:", error);
+        alert("Не удалось сохранить изменения");
+      }
+    };
+
+    const confirmDelete = () => {
+      if (confirm("Вы уверены, что хотите удалить аккаунт? Это действие необратимо.")) {
+        deleteAccount();
+      }
+    };
+
+    const deleteAccount = async () => {
+      try {
+        const user = AuthService.getCurrentUser();
+        await axios.delete("http://127.0.0.1:8000/api/user/delete/",{
+          headers: {
+            Authorization: `Bearer ${user.access}`
+          }
+        });
+        alert("Аккаунт удален");
+        // Здесь можно перенаправить пользователя, например, на страницу входа
+      } catch (error) {
+        console.error("Ошибка при удалении аккаунта:", error);
+        alert("Не удалось удалить аккаунт");
+      }
+    };
+
     return {
-      user: {
-        username: '',
-        password: ''
-      },
-      originalUser: {},
-      newUsername: '',
-      passwordFieldType: 'password',
-      hasChanges: false,
-      showEditUsernameModal: false,
-      showDeleteAccountModal: false
+      username,
+      password,
+      isModified,
+      enableSaveButton,
+      saveChanges,
+      confirmDelete,
     };
   },
-  methods: {
-    async fetchCurrentUser() {
-      try {
-        const response = await fetch('/api/user', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        this.user = {
-          username: data.username,
-          password: '********'
-        };
-        this.originalUser = JSON.parse(JSON.stringify(this.user));
-      } catch (error) {
-        console.error('Failed to fetch current user:', error);
-      }
-    },
-    togglePasswordVisibility() {
-      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-    },
-    handleInputChange() {
-      this.hasChanges = JSON.stringify(this.user) !== JSON.stringify(this.originalUser);
-    },
-    async saveChanges() {
-      try {
-        const userPayload = { ...this.user };
-        if (userPayload.password === '********') {
-          delete userPayload.password;
-        }
-
-        const response = await fetch('/api/user/', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(userPayload)
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        this.user = {
-          username: data.username,
-          password: '********'
-        };
-        this.originalUser = JSON.parse(JSON.stringify(this.user));
-        this.hasChanges = false;
-        console.log('Изменения сохранены:', data);
-      } catch (error) {
-        console.error('Failed to save changes:', error);
-      }
-    },
-    openEditUsernameModal() {
-      this.newUsername = this.user.username;
-      this.showEditUsernameModal = true;
-    },
-    closeEditUsernameModal() {
-      this.showEditUsernameModal = false;
-    },
-    async saveUsername() {
-      try {
-        const response = await fetch('/api/user/username', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ username: this.newUsername })
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        this.user.username = this.newUsername;
-        this.originalUser.username = this.newUsername;
-        this.closeEditUsernameModal();
-        this.handleInputChange();
-      } catch (error) {
-        console.error('Failed to save username:', error);
-      }
-    },
-    openDeleteAccountModal() {
-      this.showDeleteAccountModal = true;
-    },
-    closeDeleteAccountModal() {
-      this.showDeleteAccountModal = false;
-    },
-    async confirmDeleteAccount() {
-      try {
-        const response = await fetch('/api/user/delete/', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        console.log('Аккаунт удален');
-      } catch (error) {
-        console.error('Failed to delete account:', error);
-      }
-      this.closeDeleteAccountModal();
-    }
-  },
-  created() {
-    this.fetchCurrentUser();
-  }
 };
 </script>
 
@@ -248,36 +166,13 @@ export default {
   padding-top: 5px;
   display: block;
   margin-bottom: 5px;
+  width: 220px;
 }
 
-.form-group input {
+.form-group .input {
   width: 100%;
   padding: 8px;
   margin-left: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-}
-
-.edit-link {
-  margin-left: 10px;
-  color: #a55bc2;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.password-group {
-  position: relative;
-  width: 100%;
-}
-
-.password-toggle {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: #a55bc2;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 .delete-account {
@@ -313,42 +208,30 @@ export default {
   cursor: not-allowed;
 }
 
-.modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
+@media (max-width: 980px) {
+  .profile-container{
+    width: 300px;
+  }
+
+  .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-group label {
+    width: 100%; /* Занимает всю ширину */
+    margin-bottom: 5px; /* Отступ снизу */
+  }
+
+  .form-group .input {
+    margin-left: 0; /* Убираем отступ слева */
+  }
+
+  .delete-account {
+    display: flex;
+    position: relative;
+    margin: -20px 0 0 20px;
+  }
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 500px;
-  border-radius: 10px;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
 </style>

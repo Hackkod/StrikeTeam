@@ -1,8 +1,11 @@
-from djoser.conf import User
+# from djoser.conf import User
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 
@@ -129,6 +132,35 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+
+class UpdateUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+        data = request.data
+
+        # Проверка на существование логина и пароля
+        username = data.get("username")
+        password = data.get("password")
+
+        if username:
+            user.username = username
+        if password:
+            user.password = make_password(password)
+
+        user.save()
+        return JsonResponse({"message": "User updated successfully"}, status=status.HTTP_200_OK)
+
+
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return JsonResponse({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['POST'])
