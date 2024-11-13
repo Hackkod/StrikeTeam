@@ -41,6 +41,7 @@
 import NavBar from '@/components/NavBar.vue';
 import axios from 'axios';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AuthService from "@/services/auth";
 
 export default {
@@ -91,7 +92,8 @@ export default {
           }
         });
         alert("Аккаунт удален");
-        // Здесь можно перенаправить пользователя, например, на страницу входа
+        AuthService.logout();
+        router.push('/login');
       } catch (error) {
         console.error("Ошибка при удалении аккаунта:", error);
         alert("Не удалось удалить аккаунт");

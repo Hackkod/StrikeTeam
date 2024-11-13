@@ -2,17 +2,17 @@
   <div class="modal-overlay" @dblclick.self="close">
     <div class="modal-content">
       <h2>Редактировать тиммейта</h2>
-      <el-form :model="teammate" :rules="rules" ref="form">
+      <el-form :model="editedTeammate" :rules="rules" ref="form">
         <el-form-item label="Имя" prop="name">
-          <el-input v-model="teammate.name" id="name" placeholder="Введите имя" />
+          <el-input v-model="editedTeammate.name" id="name" placeholder="Введите имя" />
         </el-form-item>
 
         <el-form-item label="Ранг" prop="rank">
-          <el-input v-model="teammate.rank" id="rank" placeholder="Введите ранг" />
+          <el-input v-model="editedTeammate.rank" id="rank" placeholder="Введите ранг" />
         </el-form-item>
 
         <el-form-item label="Права" prop="rights">
-          <el-select v-model="teammate.rights" id="rights" placeholder="Выберите права">
+          <el-select v-model="editedTeammate.rights" id="rights" placeholder="Выберите права">
             <el-option label="Администратор" value="admin" />
             <el-option label="Редактор" value="editor" />
             <el-option label="Читатель" value="reader" />
@@ -20,21 +20,21 @@
         </el-form-item>
 
         <el-form-item label="Пользователь" prop="user">
-          <el-select v-model="teammate.user" id="user" placeholder="Выберите пользователя">
+          <el-select v-model="editedTeammate.user" id="user" placeholder="Выберите пользователя">
             <el-option :value="null" label="Не выбран" />
             <el-option v-for="user in users" :key="user.id" :value="user.id" :label="user.username" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="Старший" prop="parent">
-          <el-select v-model="teammate.parent" id="parent" placeholder="Выберите старшего">
+          <el-select v-model="editedTeammate.parent" id="parent" placeholder="Выберите старшего">
             <el-option :value="null" label="Не выбран" />
             <el-option v-for="parent in teammates" :key="parent.id" :value="parent.id" :label="parent.name" />
           </el-select>
         </el-form-item>
 
         <div class="button-group">
-          <el-button type="primary" @click="submitForm">Сохранить</el-button>
+          <el-button type="primary" @click="handleSave">Сохранить</el-button>
           <el-button @click="close">Отмена</el-button>
         </div>
       </el-form>
@@ -43,14 +43,15 @@
 </template>
 
 <script>
-  import axios from 'axios';
-  import AuthService from '@/services/auth';
+import axios from 'axios';
+import AuthService from '@/services/auth';
 
-  export default {
+export default {
   name: 'EditTeammateModal',
   props: ['teamId', 'teammate'],
   data() {
     return {
+      editedTeammate: { ...this.teammate },
       users: [],
       teammates: [],
       rules: {
@@ -63,15 +64,15 @@
       const user = AuthService.getCurrentUser();
       if (user) {
         axios.get('http://127.0.0.1:8000/api/users/', {
-        headers: {
+          headers: {
             Authorization: `Bearer ${user.access}`
-        }
+          }
         })
         .then(response => {
-        this.users = response.data;
+          this.users = response.data;
         })
         .catch(error => {
-        console.error('Error fetching users:', error);
+          console.error('Error fetching users:', error);
         });
       }
     },
@@ -79,20 +80,21 @@
       const user = AuthService.getCurrentUser();
       if (user && this.teamId) {
         axios.get(`http://127.0.0.1:8000/api/teammates/?team=${this.teamId}`, {
-        headers: {
+          headers: {
             Authorization: `Bearer ${user.access}`
-        }
+          }
         })
         .then(response => {
-        this.teammates = response.data.filter(teammate => teammate.team === this.teamId);
+          this.teammates = response.data.filter(teammate => teammate.team === this.teamId);
         })
         .catch(error => {
-        console.error('Error fetching teammates:', error);
+          console.error('Error fetching teammates:', error);
         });
       }
     },
-    save() {
-      this.$emit('save', this.teammate);
+    handleSave() {
+      this.$emit('save', this.editedTeammate);
+      this.close();
     },
     close() {
       this.$emit('close');
@@ -101,8 +103,13 @@
   mounted() {
     this.fetchUsers();
     this.fetchTeammates();
+  },
+  watch: {
+    teammate(newTeammate) {
+      this.editedTeammate = { ...newTeammate };
+    }
   }
-  };
+};
 </script>
 
 <style scoped>
@@ -135,4 +142,3 @@
   margin-top: 20px;
 }
 </style>
-  

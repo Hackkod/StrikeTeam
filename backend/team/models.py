@@ -71,4 +71,3 @@ class Inventory(models.Model):
         else:
             self.teammate_name = 'Команда'
         super().save(*args, **kwargs)
-    
