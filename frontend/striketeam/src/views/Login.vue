@@ -4,7 +4,7 @@
         <span class="strike">Strike</span><span class="team">Team</span>
       </div>
       <div class="login-box">
-        <h2>ВХОД</h2>
+        <h3>ВХОД</h3>
         <form @submit.prevent="login">
           <div class="textbox">
             <input type="text" placeholder="Логин" v-model="username" required>
