@@ -1,7 +1,7 @@
 <template>
   <div class="modal-overlay" @dblclick.self="close">
     <div class="modal-content">
-      <h2>Редактировать тиммейта</h2>
+      <h2>Редактировать участника</h2>
       <el-form :model="editedTeammate" :rules="rules" ref="form">
         <el-form-item label="Имя" prop="name">
           <el-input v-model="editedTeammate.name" id="name" placeholder="Введите имя" />

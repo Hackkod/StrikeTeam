@@ -1,8 +1,8 @@
 <template>
     <div class="modal-overlay" @dblclick.self="close">
       <div class="modal-content">
-        <h2>Удалить тиммейта</h2>
-        <p>Вы уверены, что хотите удалить тиммейта {{ teammate.name }}?</p>
+        <h2>Удалить участника</h2>
+        <p>Вы уверены, что хотите удалить участника {{ teammate.name }}?</p>
         <div class="button-group">
           <el-button type="primary" @click="$emit('confirm')">Да</el-button>
           <el-button @click="$emit('close')">Нет</el-button>

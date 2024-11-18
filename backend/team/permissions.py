@@ -1,6 +1,7 @@
 from rest_framework import permissions
 from .models import Teams, Teammates, Inventory
 
+
 class IsTeammate(permissions.BasePermission):
     def has_permission(self, request, view):
         user = request.user

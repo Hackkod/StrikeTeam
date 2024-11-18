@@ -1,7 +1,7 @@
 <template>
     <div class="modal-overlay" @dblclick.self="close">
       <div class="modal-content">
-        <h2>Добавить тиммейта</h2>
+        <h2>Добавить участника</h2>
         <el-form :model="teammate" :rules="rules" ref="form">
           <el-form-item label="Имя" prop="name">
             <el-input v-model="teammate.name" id="name" placeholder="Введите имя" />
