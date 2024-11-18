@@ -15,16 +15,16 @@
         <button @click="openEditTeamModal"><i class="fa fa-pen"></i></button>
         <button @click="openDeleteTeamModal"><i class="fa fa-trash"></i></button>
       </div>
-      <div class="table-toolbar">
-        <button @click="viewMode = 'hierarchy'" :class="{ active: viewMode === 'hierarchy' }">
-          <img src="../assets/structure_icon_smaller.png" />
-          <!-- &#x1F5C3; -->
-        </button>
-        <button @click="viewMode = 'table'" :class="{ active: viewMode === 'table' }">
-          <img src="../assets/table_icon_smaller.png" />
-          <!-- &#x1F4C4; -->
-        </button>
-      </div>
+<!--      <div class="table-toolbar">-->
+<!--        <button @click="viewMode = 'hierarchy'" :class="{ active: viewMode === 'hierarchy' }">-->
+<!--          <img src="../assets/structure_icon_smaller.png" />-->
+<!--          &lt;!&ndash; &#x1F5C3; &ndash;&gt;-->
+<!--        </button>-->
+<!--        <button @click="viewMode = 'table'" :class="{ active: viewMode === 'table' }">-->
+<!--          <img src="../assets/table_icon_smaller.png" />-->
+<!--          &lt;!&ndash; &#x1F4C4; &ndash;&gt;-->
+<!--        </button>-->
+<!--      </div>-->
       <div class="table-container">
         <div v-if="viewMode === 'table'" class="table-view">
           <table>
