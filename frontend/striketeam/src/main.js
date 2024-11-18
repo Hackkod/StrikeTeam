@@ -1,6 +1,14 @@
 import axios from 'axios';
 import AuthService from './services/auth';
 import router from './router';
+import { createApp } from 'vue';
+import App from './App.vue';
+import store from './store';
+import './assets/global-styles.css';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+
+const app = createApp(App);
 
 axios.interceptors.response.use(
   response => {
@@ -15,12 +23,7 @@ axios.interceptors.response.use(
   }
 );
 
-
-import { createApp } from 'vue'
-import App from './App.vue'
-import store from './store'
-import './assets/global-styles.css'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-
-createApp(App).use(store).use(router).use(ElementPlus).mount('#app')
+app.use(store)
+  .use(router)
+  .use(ElementPlus)
+  .mount('#app');

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import router from '../router';
-// import jwt_decode from 'jwt-decode';
 import { jwtDecode } from "jwt-decode";
 
 const API_URL = 'http://127.0.0.1:8000/api/';
@@ -30,19 +29,44 @@ class AuthService {
     });
   }
 
+  refreshToken() {
+    const user = this.getCurrentUser();
+    if (user && user.refresh) {
+      return axios.post(API_URL + 'token/refresh/', { refresh: user.refresh })
+        .then(response => {
+          if (response.data.access) {
+            user.access = response.data.access;
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+          return response.data.access;
+        })
+        .catch(error => {
+          console.error('Ошибка обновления токена:', error);
+        });
+    }
+    return Promise.reject('Отсутствует refresh token');
+  }
+
   getCurrentUser() {
     return JSON.parse(localStorage.getItem('user'));
   }
 
   isTokenExpired(token) {
-    const decoded = jwtDecode(token);
-    return decoded.exp * 1000 < Date.now();
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.exp * 1000 < Date.now();
+    } catch (e) {
+      return true;
+    }
   }
 
   isAuthenticated() {
     const user = this.getCurrentUser();
     if (user && user.access) {
-      return !this.isTokenExpired(user.access);
+      if (this.isTokenExpired(user.access)) {
+        return this.refreshToken().then(() => true).catch(() => false);
+      }
+      return true;
     }
     return false;
   }
