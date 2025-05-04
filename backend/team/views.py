@@ -49,16 +49,14 @@ class TeammatesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsTeammate, CanCreateTeammateOrInventory]
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = Teammates.objects.filter(
-            team__teammates__user=user
-        ).distinct()
         team_id = self.request.query_params.get('team')
         if team_id:
-            queryset = queryset.filter(
+            queryset = Teammates.objects.filter(
                 team_id=team_id
             )
-        return queryset
+            if queryset.get(user=self.request.user):
+                return queryset
+        return
 
     def perform_destroy(self, instance):
         team = instance.team
